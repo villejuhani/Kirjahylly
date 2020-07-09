@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import fi.jyu.mit.fxgui.ComboBoxChooser?>
 <?import fi.jyu.mit.fxgui.ListChooser?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -85,7 +86,7 @@
    <left>
       <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <center>
-            <ListChooser rivit="Sapiens: Ihmisen lyhyt historia&#10;Ylpeys ja ennakkoluulo&#10;Miehet jotka vihaavat naisia&#10;Lahjakas herra Ripley&#10;Frankenstein&#10;Homo Deus" BorderPane.alignment="CENTER" />
+            <ListChooser fx:id="chooserKirjat" rivit="Sapiens: Ihmisen lyhyt historia&#10;Ylpeys ja ennakkoluulo&#10;Miehet jotka vihaavat naisia&#10;Lahjakas herra Ripley&#10;Frankenstein&#10;Homo Deus" BorderPane.alignment="CENTER" />
          </center>
          <top>
             <GridPane BorderPane.alignment="CENTER">
@@ -103,7 +104,7 @@
                         <Insets left="10.0" />
                      </GridPane.margin>
                   </Label>
-                  <TextField prefHeight="22.0" GridPane.rowIndex="1">
+                  <TextField fx:id="haku" onKeyReleased="#handleHaku" prefHeight="22.0" GridPane.rowIndex="1">
                      <GridPane.margin>
                         <Insets left="5.0" right="5.0" />
                      </GridPane.margin>
@@ -127,13 +128,18 @@
                         </MenuButton>
                      </children>
                   </HBox>
+                  <Label fx:id="labelVirhe" prefHeight="17.0" prefWidth="115.0" GridPane.halignment="RIGHT" GridPane.valignment="BOTTOM">
+                     <GridPane.margin>
+                        <Insets right="10.0" />
+                     </GridPane.margin>
+                  </Label>
                </children>
             </GridPane>
          </top>
       </BorderPane>
    </left>
    <center>
-      <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <ScrollPane fx:id="panelKirja" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <content>
             <GridPane hgap="10.0">
               <columnConstraints>
@@ -168,20 +174,8 @@
                   <Label text="Tila" GridPane.halignment="LEFT" GridPane.rowIndex="6" />
                   <Label text="Arvio" GridPane.halignment="LEFT" GridPane.rowIndex="7" />
                   <Label text="Kommentit" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="TOP" />
-                  <MenuButton mnemonicParsing="false" text="8" GridPane.columnIndex="1" GridPane.rowIndex="7" GridPane.vgrow="ALWAYS">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="1" />
-                      <MenuItem mnemonicParsing="false" text="2" />
-                        <MenuItem mnemonicParsing="false" text="3" />
-                        <MenuItem mnemonicParsing="false" text="4" />
-                        <MenuItem mnemonicParsing="false" text="5" />
-                        <MenuItem mnemonicParsing="false" text="6" />
-                        <MenuItem mnemonicParsing="false" text="7" />
-                        <MenuItem mnemonicParsing="false" text="8" />
-                        <MenuItem mnemonicParsing="false" text="9" />
-                        <MenuItem mnemonicParsing="false" text="10" />
-                    </items>
-                  </MenuButton>
+                  <ComboBoxChooser rivit="1&#10;2&#10;3&#10;4&#10;5&#10;6&#10;7&#10;8&#10;9&#10;10" GridPane.columnIndex="1" GridPane.rowIndex="7" GridPane.vgrow="ALWAYS">
+            </ComboBoxChooser>
                   <TextArea maxHeight="300.0" prefHeight="300.0" prefWidth="200.0" text="Mielenkiintoinen ja hauska" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                   <GridPane prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6">
                     <columnConstraints>
@@ -193,12 +187,8 @@
                     </rowConstraints>
                      <children>
                         <DatePicker GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                        <MenuButton mnemonicParsing="false" prefWidth="185.0" text="Luettu" GridPane.hgrow="ALWAYS">
-                          <items>
-                            <MenuItem mnemonicParsing="false" text="Luettu" />
-                            <MenuItem mnemonicParsing="false" text="Lukematta" />
-                          </items>
-                        </MenuButton>
+                        <ComboBoxChooser prefWidth="185.0" rivit="Luettu&#10;Lukematta" GridPane.hgrow="ALWAYS">
+                        </ComboBoxChooser>
                      </children>
                   </GridPane>
                   <Label text="Kirjan tiedot" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />

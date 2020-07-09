@@ -33,9 +33,9 @@
          </BorderPane.margin>
          <children>
             <Label text="Kirjailija" />
-            <TextField GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" text="Peruuta" onAction="#handlePeruuta" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-            <Button mnemonicParsing="false" text="Tallenna" onAction="#handleTallenna" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+            <TextField fx:id="textVastaus" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+            <Button cancelButton="true" mnemonicParsing="false" text="Peruuta" onAction="#handlePeruuta" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Button defaultButton="true" mnemonicParsing="false" text="Tallenna" onAction="#handleTallenna" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
          </children>
       </GridPane>
    </center>

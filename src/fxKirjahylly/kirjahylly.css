@@ -1,1 +1,9 @@
-/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+.virhe {
+   /* @SuppressWarning */
+   -fx-text-fill: red;
+ }
+ 
+ .normaali {
+   /* @SuppressWarning */
+   -fx-text-fill: black;
+ }
