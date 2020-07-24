@@ -3,16 +3,23 @@
  */
 package kirjahylly;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.*;
 
 /**
  * @author ville
- * @version 9.7.2020
+ * @version 16.7.2020
  *
  */
 public class Kirjailijat implements Iterable<Kirjailija> {
     
-    private String                      tiedostonNimi = "";
+    private boolean muutettu = false;
+    private String  tiedostonNimi = "";
 
     /** Taulukko kirjailijoista */
     private Collection<Kirjailija> alkiot        = new ArrayList<Kirjailija>();
@@ -33,6 +40,7 @@ public class Kirjailijat implements Iterable<Kirjailija> {
      */
     public void lisaa(Kirjailija kirj) {
         alkiot.add(kirj);
+        muutettu = true;
     }
     
     
@@ -51,24 +59,102 @@ public class Kirjailijat implements Iterable<Kirjailija> {
 
 
     /**
-     * Lukee kirjat tiedostosta.  
-     * TODO Kesken.
-     * @param hakemisto tiedoston hakemisto
+     * Lukee kirjat tiedostosta.
+     * @param tiedosto tiedoston nimen alku
      * @throws SailoException jos lukeminen epäonnistuu
+     * @example
+     * <pre name="test">
+     * #THROWS SailoException 
+     * #import java.io.File;
+     *  Kirjailijat kirjailijat = new Kirjailijat();
+     *  Kirjailija kirjailija21 = new Kirjailija(); kirjailija21.vastaaHarari(2);
+     *  Kirjailija kirjailija11 = new Kirjailija(); kirjailija11.vastaaHarari(1);
+     *  Kirjailija kirjailija22 = new Kirjailija(); kirjailija22.vastaaHarari(2); 
+     *  Kirjailija kirjailija12 = new Kirjailija(); kirjailija12.vastaaHarari(1); 
+     *  Kirjailija kirjailija23 = new Kirjailija(); kirjailija23.vastaaHarari(2); 
+     *  String tiedNimi = "testikirjailijat";
+     *  File ftied = new File(tiedNimi+".dat");
+     *  ftied.delete();
+     *  kirjailijat.lueTiedostosta(tiedNimi); #THROWS SailoException
+     *  kirjailijat.lisaa(kirjailija21);
+     *  kirjailijat.lisaa(kirjailija11);
+     *  kirjailijat.lisaa(kirjailija22);
+     *  kirjailijat.lisaa(kirjailija12);
+     *  kirjailijat.lisaa(kirjailija23);
+     *  kirjailijat.tallenna();
+     *  kirjailijat = new Kirjailijat();
+     *  kirjailijat.lueTiedostosta(tiedNimi);
+     *  Iterator<Kirjailija> i = kirjailijat.iterator();
+     *  i.next().toString() === kirjailija21.toString();
+     *  i.next().toString() === kirjailija11.toString();
+     *  i.next().toString() === kirjailija22.toString();
+     *  i.next().toString() === kirjailija12.toString();
+     *  i.next().toString() === kirjailija23.toString();
+     *  i.hasNext() === false;
+     *  kirjailijat.lisaa(kirjailija23);
+     *  kirjailijat.tallenna();
+     *  ftied.delete() === true;
+     *  File fbak = new File(tiedNimi+".bak");
+     *  fbak.delete() === true;
+     * </pre>
      */
-    public void lueTiedostosta(String hakemisto) throws SailoException {
-        tiedostonNimi = hakemisto + ".kirj";
-        throw new SailoException("Ei osata vielä lukea tiedostoa " + tiedostonNimi);
+    public void lueTiedostosta(String tiedosto) throws SailoException {
+        setTiedostonPerusNimi(tiedosto);
+        try (Scanner fi = new Scanner(new FileInputStream(new File(getTiedostonNimi())))){
+            
+            
+            while (fi.hasNext()) {
+                String rivi = fi.nextLine();
+                rivi.trim();
+                Kirjailija kirjailija = new Kirjailija();
+                kirjailija.parse(rivi);
+                lisaa(kirjailija);
+            }
+            muutettu = false;
+        } catch ( FileNotFoundException e ) {
+            throw new SailoException("Tiedosto " + getTiedostonNimi() + " ei aukea");
+        }
+    }
+    
+    
+    /**
+     * Luetaan aikaisemmin annetun nimisestä tiedostosta
+     * @throws SailoException jos tulee poikkeus
+     */
+    public void lueTiedostosta() throws SailoException {
+        lueTiedostosta(getTiedostonPerusNimi());
     }
 
 
     /**
      * Tallentaa kirjat tiedostoon.  
-     * TODO Kesken.
      * @throws SailoException jos talletus epäonnistuu
+     * Tiedoston muoto:
+     * <pre>
+     * 2|Yuval Noah Harari
+     * 3|Jane Austen
+     * </pre>
      */
-    public void talleta() throws SailoException {
-        throw new SailoException("Ei osata vielä tallettaa tiedostoa " + tiedostonNimi);
+    public void tallenna() throws SailoException {
+        if (!muutettu) return;
+        
+        File fbak = new File(getBakNimi());
+        File ftied = new File(getTiedostonNimi());
+        fbak.delete(); //  if ... System.err.println("Ei voi tuhota");
+        ftied.renameTo(fbak); //  if ... System.err.println("Ei voi nimetä");
+  
+        try ( PrintStream fo = new PrintStream(new FileOutputStream(ftied.getCanonicalPath(),true)) ) {
+            for (Kirjailija kirjailija : this) {
+                fo.println(kirjailija.toString());
+            }
+        } catch ( FileNotFoundException ex ) {
+            throw new SailoException("Tiedosto " + ftied.getName() + " ei aukea");
+        } catch ( IOException ex ) {
+            throw new SailoException("Tiedoston " + ftied.getName() + " kirjoittamisessa ongelmia");
+        }
+
+  
+        muutettu = false;
     }
 
 
@@ -79,6 +165,43 @@ public class Kirjailijat implements Iterable<Kirjailija> {
     public int getLkm() {
         return alkiot.size();
     }
+    
+    
+    /**
+     * Asettaa tiedoston perusnimen ilan tarkenninta
+     * @param tied tallennustiedoston perusnimi
+     */
+    public void setTiedostonPerusNimi(String tied) {
+        tiedostonNimi = tied;
+    }
+ 
+ 
+    /**
+     * Palauttaa tiedoston nimen, jota käytetään tallennukseen
+     * @return tallennustiedoston nimi
+     */
+    public String getTiedostonPerusNimi() {
+        return tiedostonNimi;
+    }
+ 
+ 
+    /**
+     * Palauttaa tiedoston nimen, jota käytetään tallennukseen
+     * @return tallennustiedoston nimi
+     */
+    public String getTiedostonNimi() {
+        return tiedostonNimi + ".dat";
+    }
+ 
+ 
+    /**
+     * Palauttaa varakopiotiedoston nimen
+     * @return varakopiotiedoston nimi
+     */
+    public String getBakNimi() {
+        return tiedostonNimi + ".bak";
+    }
+    
     
     /**
      * Iteraattori kaikkien kirjailijoiden läpikäymiseen

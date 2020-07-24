@@ -1,7 +1,10 @@
 package fxKirjahylly;
 
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.List;
+
+import fi.jyu.mit.fxgui.ComboBoxChooser;
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ListChooser;
 import fi.jyu.mit.fxgui.ModalController;
@@ -29,6 +32,7 @@ public class KirjahyllyGUIController {
     @FXML private Label labelVirhe;
     @FXML private ScrollPane panelKirja;
     @FXML private ListChooser<Kirja> chooserKirjat;
+    @FXML private ComboBoxChooser<String> chooserJarjesta;
     
     
 
@@ -83,7 +87,9 @@ public class KirjahyllyGUIController {
    
     
     @FXML void handleJarjesta() {
-        Dialogs.showMessageDialog("Vielä ei osata järjestää");
+        if (kirjaKohdalla == null)
+            Dialogs.showMessageDialog("Vielä ei osata järjestää");
+        else hae(kirjaKohdalla.getTunnusNro());
     }
 
     
@@ -98,6 +104,7 @@ public class KirjahyllyGUIController {
     private Kirjahylly kirjahylly;
     private Kirja kirjaKohdalla;
     private TextArea areaKirja = new TextArea();
+    private String kirjahyllynnimi = "kirjalista";
     
     
     /**
@@ -145,19 +152,51 @@ public class KirjahyllyGUIController {
     
     
     /**
+     * Alustaa kirjahyllyn lukemalla sen valitun nimisestä tiedostosta
+     * @return null jos onnistuu, muuten virhe
+     */
+    protected String lueTiedosto() {
+        try {
+            kirjahylly.lueTiedostosta(kirjahyllynnimi);
+            hae(0);
+            return null;
+        } catch (SailoException e) {
+            hae(0);
+            String virhe = e.getMessage();
+            if ( virhe != null) Dialogs.showMessageDialog(virhe);
+            return virhe;
+        }
+    }
+    
+    
+    /**
      * Hakee kirjojen tiedot listaan
      * @param knro kirjan numero, joka aktivoidaan haun jälkeen
      */
     protected void hae(int knro) {
-        chooserKirjat.clear();
+        int k = chooserJarjesta.getSelectionModel().getSelectedIndex();
+        String ehto = haku.getText();
+        if (k > 0 || ehto.length() > 0)
+            naytaVirhe(String.format("Ei osata hakea", k, ehto));
+        else
+            naytaVirhe(null);
         
+        chooserKirjat.clear();
+  
         int index = 0;
-        for (int i = 0; i < kirjahylly.getKirjoja(); i++) {
-            Kirja kirja = kirjahylly.annaKirja(i);
-            if (kirja.getTunnusNro() == knro) index = i;
-            chooserKirjat.add(kirja.getNimi(), kirja);
+        Collection<Kirja> kirjat;
+        try {
+            kirjat = kirjahylly.etsi(ehto, k);
+            int i = 0;
+            for (Kirja kirja: kirjat) {
+                if (kirja.getTunnusNro() == knro) index = i;
+                chooserKirjat.add(kirja.getNimi(), kirja);
+                i++;
+            }
+        } catch (SailoException ex) {
+            Dialogs.showMessageDialog("Jäsenen hakemisessa ongelmia! " + ex.getMessage());
         }
-        chooserKirjat.setSelectedIndex(index);
+        chooserKirjat.setSelectedIndex(index); // tästä tulee muutosviesti joka näyttää jäsenen
     }
     
     
@@ -238,11 +277,13 @@ public class KirjahyllyGUIController {
     public void tulostaValitut(TextArea text) {
         try (PrintStream os = TextAreaOutputStream.getTextPrintStream(text)) {
             os.println("Tulostetaan kaikki kirjat");
-            for (int i = 0; i < kirjahylly.getKirjoja(); i++) {
-                Kirja kirja = kirjahylly.annaKirja(i);
+            Collection<Kirja> kirjat = kirjahylly.etsi("", -1);
+            for (Kirja kirja: kirjat) {
                 tulosta(os, kirja);
                 os.println("\n\n");
             }
+        } catch (SailoException ex) {
+            Dialogs.showMessageDialog("Kirjan hakemisessa ongelmia " + ex.getMessage());
         }
     }
 
@@ -259,9 +300,22 @@ public class KirjahyllyGUIController {
     
     /**
      * Tallennetaan tiedot
+     * @return null jos onnistuu, muuten virhe
      */
-    private void tallenna(){
-        Dialogs.showMessageDialog("Tallennetaan! Mutta ei toimi vielä.");
+    private String tallenna(){
+        try {
+            kirjahylly.tallenna();
+            return null;
+        } catch (SailoException ex) {
+            Dialogs.showMessageDialog("Tallennuksessa ongelmia! " + ex.getMessage());
+            return ex.getMessage();
+        }
     }
+
+    /*
+    public void avaa() {
+        //String nimi = LisaaKirjailijaController.lisaaNimi(null, "");
+        lueTiedosto(nimi);
+    }*/
   
 }

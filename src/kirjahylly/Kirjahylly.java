@@ -3,6 +3,8 @@
  */
 package kirjahylly;
 
+import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -11,8 +13,8 @@ import java.util.List;
  *
  */
 public class Kirjahylly {
-    private final Kirjat kirjat = new Kirjat();
-    private final Kirjailijat kirjailijat = new Kirjailijat();
+    private Kirjat kirjat = new Kirjat();
+    private Kirjailijat kirjailijat = new Kirjailijat();
 
     
     /**
@@ -32,23 +34,14 @@ public class Kirjahylly {
      * #THROWS SailoException 
      * Kirjahylly kirjahylly = new Kirjahylly();
      * Kirja kirja1 = new Kirja(), kirja2 = new Kirja();
-     * kirja1.rekisteroi(); kirja2.rekisteroi();
-     * kirjahylly.getKirjoja() === 0;
-     * kirjahylly.lisaa(kirja1); kirjahylly.getKirjoja() === 1;
-     * kirjahylly.lisaa(kirja2); kirjahylly.getKirjoja() === 2;
-     * kirjahylly.lisaa(kirja1); kirjahylly.getKirjoja() === 3;
-     * kirjahylly.annaKirja(0) === kirja1;
-     * kirjahylly.annaKirja(1) === kirja2;
-     * kirjahylly.annaKirja(2) === kirja1;
-     * kirjahylly.annaKirja(1) == kirja1 === false;
-     * kirjahylly.annaKirja(1) == kirja2 === true;
-     * kirjahylly.annaKirja(3) === kirja1; #THROWS IndexOutOfBoundsException 
-     * kirjahylly.lisaa(kirja1); kirjahylly.getKirjoja() === 4;
-     * kirjahylly.lisaa(kirja1); kirjahylly.getKirjoja() === 5;
-     * kirjahylly.lisaa(kirja1); kirjahylly.getKirjoja() === 6;
-     * kirjahylly.lisaa(kirja1); kirjahylly.getKirjoja() === 7;
-     * kirjahylly.lisaa(kirja1); kirjahylly.getKirjoja() === 8;
-     * kirjahylly.lisaa(kirja1);  #THROWS SailoException
+     * kirjahylly.lisaa(kirja1);
+     * kirjahylly.lisaa(kirja2);
+     * kirjahylly.lisaa(kirja1); 
+     * Collection<Kirja> loytyneet = kirjahylly.etsi("",1);
+     * Iterator<Kirja> it = loytyneet.iterator();
+     * it.next() === kirja1;
+     * it.next() === kirja2;
+     * it.next() === kirja1;
      * </pre>
      */
     public void lisaa(Kirja kirja) throws SailoException {
@@ -135,6 +128,32 @@ public class Kirjahylly {
         return kirjailijat.annaKirjailijat();
     }
     
+    
+    /**
+     * Palautetaan hakuehtoa vastaavien kirjojen viitteet
+     * @param hakuehto hakuehto
+     * @param k etsittävän kentän indeksi
+     * @return tietorakenne löytyneistä kirjoista
+     * @throws SailoException jos menee pieleen
+     */
+    public Collection<Kirja> etsi(String hakuehto, int k) throws SailoException{
+        return kirjat.etsi(hakuehto, k);
+    }
+    
+    
+    /**
+     * Asettaa tiedostojen perusnimet
+     * @param nimi uusi nimi
+     */
+    public void setTiedosto(String nimi) {
+        File dir = new File(nimi);
+        dir.mkdirs();
+        String hakemistonNimi = nimi +"/";
+        //if ( !nimi.isEmpty() ) hakemistonNimi = nimi +"/";
+        kirjat.setTiedostonPerusNimi(hakemistonNimi + "kirjat");
+        kirjailijat.setTiedostonPerusNimi(hakemistonNimi + "kirjailijat");
+    }
+    
  
     /**
      * Lukee kirjahyllyn tiedot tiedostosta
@@ -142,8 +161,12 @@ public class Kirjahylly {
      * @throws SailoException jos lukeminen epäonnistuu
      */
     public void lueTiedostosta(String nimi) throws SailoException {
-        kirjat.lueTiedostosta(nimi);
-        kirjailijat.lueTiedostosta(nimi);
+        kirjat = new Kirjat();
+        kirjailijat = new Kirjailijat();
+        
+        setTiedosto(nimi);
+        kirjat.lueTiedostosta();
+        kirjailijat.lueTiedostosta();
     }
 
 
@@ -177,9 +200,20 @@ public class Kirjahylly {
      * Tallettaa kirjahyllyn tiedot tiedostoon
      * @throws SailoException jos tallettamisessa ongelmia
      */
-    public void talleta() throws SailoException {
-        kirjat.talleta();
-        // TODO: yritä tallettaa toinen vaikka toinen epäonnistuisi
+    public void tallenna() throws SailoException {
+        String virhe = "";
+        try {
+            kirjat.tallenna();
+        } catch ( SailoException ex ) {
+            virhe = ex.getMessage();
+        }
+ 
+        try {
+            kirjailijat.tallenna();
+        } catch ( SailoException ex ) {
+            virhe += ex.getMessage();
+        }
+        if ( !"".equals(virhe) ) throw new SailoException(virhe);
     }
 
 
@@ -231,9 +265,10 @@ public class Kirjahylly {
             System.out.println(
                     "============= Kirjahylly testi =================");
 
-            for (int i = 0; i < kirjahylly.getKirjoja(); i++) {
-                Kirja kirja = kirjahylly.annaKirja(i);
-                System.out.println("Kirja paikassa: " + i);
+            Collection<Kirja> kirjat = kirjahylly.etsi("", -1);
+            int i = 0;
+            for (Kirja kirja: kirjat) {
+            System.out.println("Kirja paikassa: " + i);
                 kirja.tulosta(System.out);
                 List<Kirjailija> loytyneet = kirjahylly.annaKirjailijat(kirja);
                 for (Kirjailija kirjailija : loytyneet)

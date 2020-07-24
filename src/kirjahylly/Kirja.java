@@ -1,10 +1,9 @@
-/**
- * 
- */
 package kirjahylly;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+
+import fi.jyu.mit.ohj2.Mjonot;
 
 /**
  * @author ville
@@ -44,7 +43,7 @@ public class Kirja {
      * TODO: poista kun kaikki toimii
      */
     public void taytaSapiensTiedoilla() {
-        nimi = "Sapiens: Ihmisen lyhyt historia ";
+        nimi = "Sapiens: Ihmisen lyhyt historia";
         genre = "Tietokirjallisuus";
         julkaisuVuosi = 2011;
         sivumaara = "491";
@@ -107,6 +106,88 @@ public class Kirja {
     public int getTunnusNro() {
         return tunnusNro;
     }
+    
+    
+    /**
+     * Asettaa tunnusnumeron ja samalla varmistaa että
+     * seuraava numero on aina suurempi kuin tähän mennessä suurin.
+     * @param nr asetettava tunnusnumero
+     */
+    private void setTunnusNro(int nr) {
+        tunnusNro = nr;
+        if (tunnusNro >= seuraavaNro) seuraavaNro = tunnusNro + 1;
+    }
+
+    
+    /**
+     * Palauttaa kirjann tiedot merkkijonona jonka voi tallentaa tiedostoon.
+     * @return kirja tolppaeroteltuna merkkijonona 
+     * @example
+     * <pre name="test">
+     *   Kirja kirja = new Kirja();
+     *   kirja.parse("  1  |  Sapiens  | Tietokirjallisuus");
+     *   kirja.toString().startsWith("1|Sapiens|Tietokirjallisuus|") === true; // on enemmäkin kuin 3 kenttää, siksi loppu |
+     * </pre>  
+     */
+    @Override
+    public String toString() {
+        return "" + 
+                getTunnusNro() + "|" +
+                nimi + "|" +
+                genre + "|" +
+                julkaisuVuosi + "|" +
+                sivumaara + "|" +
+                tila + "|" +
+                lukuPvm + "|" +
+                arvio + "|" +
+                kommentit;
+    }
+    
+    
+    /**
+     * Selvittää kirjan tiedot | erotellusta merkkijonosta
+     * Huolehtii että seuraavaNro on suurempi kuin tuleva tunnusNro.
+     * @param rivi josta kirjan tiedot otetaan
+     * @example
+     * <pre name="test">
+     *   Kirja kirja = new Kirja();
+     *   kirja.parse("   1  |  Sapiens   | Tietokirjallisuus");
+     *   kirja.getTunnusNro() === 1;
+     *   kirja.toString().startsWith("1|Sapiens|Tietokirjallisuus|") === true; // on enemmäkin kuin 3 kenttää, siksi loppu |
+     *  
+     *   kirja.rekisteroi();
+     *   int n = kirja.getTunnusNro();
+     *   kirja.parse(""+(n+20));       // Otetaan merkkijonosta vain tunnusnumero
+     *   kirja.rekisteroi();           // ja tarkistetaan että seuraavalla kertaa tulee yhtä isompi
+     *   kirja.getTunnusNro() === n+20+1;
+     * </pre>
+     */
+    public void parse(String rivi) {
+        StringBuilder sb = new StringBuilder(rivi);
+        setTunnusNro(Mjonot.erota(sb, '|', getTunnusNro()));
+        nimi = Mjonot.erota(sb, '|', nimi);
+        genre = Mjonot.erota(sb, '|', genre);
+        julkaisuVuosi = Mjonot.erota(sb, '|', julkaisuVuosi);
+        sivumaara = Mjonot.erota(sb, '|', sivumaara);
+        tila = Mjonot.erota(sb, '|', tila);
+        lukuPvm = Mjonot.erota(sb, '|', lukuPvm);
+        arvio = Mjonot.erota(sb, '|', arvio);
+        kommentit = Mjonot.erota(sb, '|', kommentit);
+    }
+    
+    
+    @Override
+    public boolean equals(Object kirja) {
+        if ( kirja == null ) return false;
+        return this.toString().equals(kirja.toString());
+    }
+
+
+    @Override
+    public int hashCode() {
+        return tunnusNro;
+    }
+
     
 
     /**

@@ -6,6 +6,8 @@ package kirjahylly;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import fi.jyu.mit.ohj2.Mjonot;
+
 /**
  * @author ville
  * @version 30.6.2020
@@ -61,7 +63,7 @@ public class Kirjailija {
      * @example
      * <pre name="test">
      *   Kirjailija sapiens = new Kirjailija("Shelley");
-     *   sapiens.getNimi() =R= "Shelley .*";
+     *   sapiens.getNimi() =R= "Shelley";
      * </pre>
      */
     public String getNimi() {
@@ -143,6 +145,74 @@ public class Kirjailija {
     public int getKirjaNro() {
         return kirjaNro;
     }
+    
+    
+   /**
+    * Asettaa tunnusnumeron ja samalla varmistaa että
+    * seuraava numero on aina suurempi kuin tähän mennessä suurin.
+    * @param nr asetettava tunnusnumero
+    */
+   private void setTunnusNro(int nr) {
+       tunnusNro = nr;
+       if ( tunnusNro >= seuraavaNro ) seuraavaNro = tunnusNro + 1;
+   }
+
+
+   /**
+    * Palauttaa kirjailijan tiedot merkkijonona jonka voi tallentaa tiedostoon.
+    * @return kirjailija tolppaeroteltuna merkkijonona 
+    * @example
+    * <pre name="test">
+    *   Kirjailija kirjailija = new Kirjailija();
+    *   kirjailija.parse("   2   | 4 | Yuval Noah Harari");
+    *   kirjailija.toString()    === "2|4|Yuval Noah Harari";
+    * </pre>
+    */
+   @Override
+   public String toString() {
+       return "" + getTunnusNro() + "|" + nimi;
+   }
+
+
+   /**
+    * Selvittää kirjailijan tiedot | erotellusta merkkijonosta.
+    * Pitää huolen että seuraavaNro on suurempi kuin tuleva tunnusnro.
+    * @param rivi josta kirjailijan tiedot otetaan
+    * @example
+    * <pre name="test">
+    *   Kirjailija kirjailija = new Kirjailija();
+    *   kirjailija.parse("   2   | 4 | Yuval Noah Harari");
+    *   kirjailija.getKirjaNro() === 4
+    *   kirjailija.toString()    === "2|4|Yuval Noah Harari";
+    *   
+    *   kirjailija.rekisteroi();
+    *   int n = kirjailija.getTunnusNro();
+    *   kirjailija.parse(""+(n+20));
+    *   kirjailija.rekisteroi();
+    *   kirjailija.getTunnusNro() === n+20+1;
+    *   kirjailija.toString()     === "" + (n+20+1) + "|4|Yuval Noah Harari";
+    * </pre>
+    */
+   public void parse(String rivi) {
+       StringBuffer sb = new StringBuffer(rivi);
+       setTunnusNro(Mjonot.erota(sb, '|', getTunnusNro()));
+       kirjaNro = Mjonot.erota(sb, '|', kirjaNro);
+       nimi = Mjonot.erota(sb, '|', nimi);
+   }
+
+
+   @Override
+   public boolean equals(Object obj) {
+       if ( obj == null ) return false;
+       return this.toString().equals(obj.toString());
+   }
+   
+
+   @Override
+   public int hashCode() {
+       return tunnusNro;
+   }
+
     
 
     /**

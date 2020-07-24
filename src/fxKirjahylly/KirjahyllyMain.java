@@ -1,6 +1,7 @@
 package fxKirjahylly;
 	
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import kirjahylly.Kirjahylly;
 import javafx.scene.Scene;
@@ -37,6 +38,7 @@ public class KirjahyllyMain extends Application {
 			
 			primaryStage.show();
 			
+			kirjahyllyCtrl.lueTiedosto();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
