@@ -7,13 +7,14 @@ import fi.jyu.mit.ohj2.Mjonot;
 
 /**
  * @author ville
- * @version 9.7.2020
+ * @version 24.7.2020
  *
  */
 public class Kirja {
     
     private int tunnusNro;
     private String nimi  = "";
+    private int kirjailijaId = 0;
     private String genre  = "";
     private int julkaisuVuosi  = 0;
     private String sivumaara  = "";
@@ -25,6 +26,23 @@ public class Kirja {
     private static int seuraavaNro = 1;
     
     
+    /**
+     * alustetaan tietyn kirjailijan kirja
+     * @param kirjailijaId kirjailijan viitenumero
+     */
+    public Kirja(int kirjailijaId) {
+        this.kirjailijaId = kirjailijaId;
+    }
+    
+    
+    /**
+     * tyhjän kirjan alustus
+     */
+    public Kirja() {
+        // attribuuttien alustus riittää
+    }
+
+
     /**
      * @return kirjan nimi
      * @example
@@ -51,6 +69,25 @@ public class Kirja {
         lukuPvm = "3.2020";
         arvio = 8;
         kommentit = "hauska";
+    }
+    
+    
+    /**
+     * Lisätään kirjalla kirjailija
+     * @param kirjailijanId kirjailijan viitenumero
+     */
+    public void lisaaKirjailija(int kirjailijanId) {
+        kirjailijaId = kirjailijanId;
+    }
+    
+    
+    /**
+     * palauttaa kirjan kirjailijan tunnusnumeron
+     * @return kirjailijan Id
+     * 
+     */
+    public int getKirjailijaId() {
+        return this.kirjailijaId;
     }
    
     
@@ -125,8 +162,8 @@ public class Kirja {
      * @example
      * <pre name="test">
      *   Kirja kirja = new Kirja();
-     *   kirja.parse("  1  |  Sapiens  | Tietokirjallisuus");
-     *   kirja.toString().startsWith("1|Sapiens|Tietokirjallisuus|") === true; // on enemmäkin kuin 3 kenttää, siksi loppu |
+     *   kirja.parse("  1  |  Sapiens  | 1 |Tietokirjallisuus");
+     *   kirja.toString().startsWith("1|Sapiens|1|Tietokirjallisuus|") === true; // on enemmäkin kuin 3 kenttää, siksi loppu |
      * </pre>  
      */
     @Override
@@ -134,6 +171,7 @@ public class Kirja {
         return "" + 
                 getTunnusNro() + "|" +
                 nimi + "|" +
+                kirjailijaId + "|" +
                 genre + "|" +
                 julkaisuVuosi + "|" +
                 sivumaara + "|" +
@@ -151,9 +189,9 @@ public class Kirja {
      * @example
      * <pre name="test">
      *   Kirja kirja = new Kirja();
-     *   kirja.parse("   1  |  Sapiens   | Tietokirjallisuus");
+     *   kirja.parse("   1  |  Sapiens   | 1 | Tietokirjallisuus");
      *   kirja.getTunnusNro() === 1;
-     *   kirja.toString().startsWith("1|Sapiens|Tietokirjallisuus|") === true; // on enemmäkin kuin 3 kenttää, siksi loppu |
+     *   kirja.toString().startsWith("1|Sapiens|1|Tietokirjallisuus|") === true; // on enemmäkin kuin 3 kenttää, siksi loppu |
      *  
      *   kirja.rekisteroi();
      *   int n = kirja.getTunnusNro();
@@ -166,6 +204,7 @@ public class Kirja {
         StringBuilder sb = new StringBuilder(rivi);
         setTunnusNro(Mjonot.erota(sb, '|', getTunnusNro()));
         nimi = Mjonot.erota(sb, '|', nimi);
+        kirjailijaId = Mjonot.erota(sb, '|', kirjailijaId);
         genre = Mjonot.erota(sb, '|', genre);
         julkaisuVuosi = Mjonot.erota(sb, '|', julkaisuVuosi);
         sivumaara = Mjonot.erota(sb, '|', sivumaara);

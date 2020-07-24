@@ -1,7 +1,6 @@
 package fxKirjahylly;
 	
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.stage.Stage;
 import kirjahylly.Kirjahylly;
 import javafx.scene.Scene;
@@ -11,7 +10,7 @@ import javafx.fxml.FXMLLoader;
 
 /**
  * @author ville
- * @version 9.7.2020
+ * @version 24.7.2020
  *
  */
 public class KirjahyllyMain extends Application {

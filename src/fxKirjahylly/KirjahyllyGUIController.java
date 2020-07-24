@@ -23,7 +23,7 @@ import kirjahylly.SailoException;
 
 /**
  * @author ville
- * @version 9.7.2020
+ * @version 24.7.2020
  *
  */
 public class KirjahyllyGUIController {
@@ -225,9 +225,10 @@ public class KirjahyllyGUIController {
         String uusiKirjailija = LisaaKirjailijaController.lisaaNimi(null, "");
         if (uusiKirjailija == null)
             return;
-        Kirjailija kirjailija = new Kirjailija(uusiKirjailija, kirjaKohdalla.getTunnusNro());
+        Kirjailija kirjailija = new Kirjailija(uusiKirjailija);
         kirjailija.rekisteroi();
         kirjahylly.lisaa(kirjailija);
+        kirjaKohdalla.lisaaKirjailija(kirjailija.getTunnusNro());
         hae(kirjaKohdalla.getTunnusNro());
     }
     
@@ -239,9 +240,10 @@ public class KirjahyllyGUIController {
         if (kirjaKohdalla == null) return;
         String uusiKirjailija = TietojenMuokkausController.annaKirjailija(null, "");
         if (uusiKirjailija == null) return;
-        Kirjailija kirjailija = new Kirjailija(uusiKirjailija, kirjaKohdalla.getTunnusNro());
+        Kirjailija kirjailija = new Kirjailija(uusiKirjailija);
         kirjailija.rekisteroi();
         kirjahylly.lisaa(kirjailija);
+        kirjaKohdalla.lisaaKirjailija(kirjailija.getTunnusNro());
         hae(kirjaKohdalla.getTunnusNro());
     }
     
@@ -311,11 +313,5 @@ public class KirjahyllyGUIController {
             return ex.getMessage();
         }
     }
-
-    /*
-    public void avaa() {
-        //String nimi = LisaaKirjailijaController.lisaaNimi(null, "");
-        lueTiedosto(nimi);
-    }*/
   
 }

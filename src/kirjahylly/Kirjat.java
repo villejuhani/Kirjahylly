@@ -7,10 +7,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,7 +18,7 @@ import java.util.Scanner;
 
 /**
  * @author ville
- * @version 14.7.2020
+ * @version 24.7.2020
  *
  */
 public class Kirjat implements Iterable<Kirja> {
@@ -87,7 +85,7 @@ public class Kirjat implements Iterable<Kirja> {
 
 
     /**
-     * Lukee kirjat tiedostosta.  Kesken.
+     * Lukee kirjat tiedostosta. 
      * @param tied tiedoston perusnimi
      * @throws SailoException jos lukeminen epäonnistuu
      * @example

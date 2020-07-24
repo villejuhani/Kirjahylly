@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * @author ville
- * @version 9.7.2020
+ * @version 24.7.2020
  *
  */
 public class Kirjahylly {
@@ -67,31 +67,31 @@ public class Kirjahylly {
      * #import java.util.*;
      * 
      *  Kirjahylly kirjahylly = new Kirjahylly();
+     *  
+     *  Kirjailija kirj21 = new Kirjailija("Harari"); kirj21.rekisteroi(); kirjahylly.lisaa(kirj21); 
+     *  Kirjailija kirj11 = new Kirjailija("Austen"); kirj11.rekisteroi(); kirjahylly.lisaa(kirj11); 
+     *  Kirjailija kirj22 = new Kirjailija("Shelley"); kirj22.rekisteroi(); kirjahylly.lisaa(kirj22); 
+     *  int id1 = kirj21.getTunnusNro();
+     *  int id2 = kirj11.getTunnusNro();      
+     *  
      *  Kirja kirja1 = new Kirja(), kirja2 = new Kirja(), kirja3 = new Kirja();
+     *  kirja1.lisaaKirjailija(id1); kirja2.lisaaKirjailija(id2); 
      *  kirja1.rekisteroi(); kirja2.rekisteroi(); kirja3.rekisteroi();
-     *  int id1 = kirja1.getTunnusNro();
-     *  int id2 = kirja2.getTunnusNro();                      
-     *  Kirjailija kirj21 = new Kirjailija(id2); kirjahylly.lisaa(kirj21); 
-     *  Kirjailija kirj11 = new Kirjailija(id1); kirjahylly.lisaa(kirj11); 
-     *  Kirjailija kirj22 = new Kirjailija(id2); kirjahylly.lisaa(kirj22); 
-     *  Kirjailija kirj12 = new Kirjailija(id1); kirjahylly.lisaa(kirj12); 
-     *  Kirjailija kirj23 = new Kirjailija(id2); kirjahylly.lisaa(kirj23); 
-     *
+     *  kirja3.lisaaKirjailija(id1);
      *  
      *  List<Kirjailija> loytyneet;
      *  loytyneet = kirjahylly.annaKirjailijat(kirja3);
-     *  loytyneet.size() === 0; 
+     *  loytyneet.size() === 1; 
      *  loytyneet = kirjahylly.annaKirjailijat(kirja1);
-     *  loytyneet.size() === 2; 
-     *  loytyneet.get(0) == kirj11 === true;
-     *  loytyneet.get(1) == kirj12 === true;
+     *  loytyneet.size() === 1; 
+     *  loytyneet.get(0) == kirj21 === true;
      *  loytyneet = kirjahylly.annaKirjailijat(kirja2);
-     *  loytyneet.size() === 3; 
-     *  loytyneet.get(0) == kirj23 === false;
+     *  loytyneet.size() === 1; 
+     *  loytyneet.get(0) == kirj22 === false;
      * </pre> 
      */
     public List<Kirjailija> annaKirjailijat(Kirja kirja) {
-        return kirjailijat.annaKirjailijat(kirja.getTunnusNro());
+        return kirjailijat.annaKirjailijat(kirja.getKirjailijaId());
     }
     
     
@@ -103,25 +103,17 @@ public class Kirjahylly {
      * #import java.util.*;
      * 
      *  Kirjahylly kirjahylly = new Kirjahylly();
-     *  Kirja kirja1 = new Kirja(), kirja2 = new Kirja(), kirja3 = new Kirja();
-     *  kirja1.rekisteroi(); kirja2.rekisteroi(); kirja3.rekisteroi();
-     *  int id1 = kirja1.getTunnusNro();
-     *  int id2 = kirja2.getTunnusNro();                      
-     *  Kirjailija kirj21 = new Kirjailija(id2); kirjahylly.lisaa(kirj21); 
-     *  Kirjailija kirj11 = new Kirjailija(id1); kirjahylly.lisaa(kirj11); 
-     *  Kirjailija kirj22 = new Kirjailija(id2); kirjahylly.lisaa(kirj22); 
-     *  Kirjailija kirj12 = new Kirjailija(id1); kirjahylly.lisaa(kirj12); 
-     *  Kirjailija kirj23 = new Kirjailija(id2); kirjahylly.lisaa(kirj23); 
      *
+     *  Kirjailija kirj25 = new Kirjailija("Harari"); kirj25.rekisteroi(); kirjahylly.lisaa(kirj25); 
+     *  Kirjailija kirj18 = new Kirjailija("Austen"); kirj18.rekisteroi(); kirjahylly.lisaa(kirj18); 
+     *  Kirjailija kirj26 = new Kirjailija("Shelley"); kirj26.rekisteroi(); kirjahylly.lisaa(kirj26); 
      *  
      *  List<Kirjailija> loytyneet;
      *  loytyneet = kirjahylly.annaKirjailijat();
-     *  loytyneet.size() === 5; 
-     *  loytyneet.get(0) == kirj21 === true;
-     *  loytyneet.get(3) == kirj12 === true;
-     *  loytyneet.get(0) == kirj23 === false;
-     *  loytyneet = kirjahylly.annaKirjailijat(kirja1);
-     *  loytyneet.get(1) == kirj12 === true;
+     *  loytyneet.size() === 3; 
+     *  loytyneet.get(0) == kirj25 === true;
+     *  loytyneet.get(2) == kirj26 === true;
+     *  loytyneet.get(0) == kirj18 === false;
      * </pre> 
      */
     public List<Kirjailija> annaKirjailijat() {
@@ -246,21 +238,30 @@ public class Kirjahylly {
         Kirjahylly kirjahylly = new Kirjahylly();
 
         try {
-            Kirja sapiens = new Kirja();
-            Kirja frankenstein = new Kirja();
-
+            
+            Kirjailija harari = new Kirjailija();
+            Kirjailija austen = new Kirjailija("Austen");
+            harari.vastaaHarari();
+            harari.rekisteroi(); austen.rekisteroi();
+            kirjahylly.lisaa(harari); kirjahylly.lisaa(austen);
+            
+            int id1 = harari.getTunnusNro();
+            int id2 = austen.getTunnusNro();
+            
+            Kirja sapiens = new Kirja(id1);
+            Kirja frankenstein = new Kirja(id2);
+            Kirja deus = new Kirja();
             sapiens.rekisteroi();
             sapiens.taytaSapiensTiedoilla();
             frankenstein.rekisteroi();
             frankenstein.taytaSapiensTiedoilla();
+            deus.rekisteroi();
+            deus.taytaSapiensTiedoilla();
 
             kirjahylly.lisaa(sapiens);
             kirjahylly.lisaa(frankenstein);
-            int id1 = sapiens.getTunnusNro();
-            int id2 = frankenstein.getTunnusNro();
-            Kirjailija kirj1 = new Kirjailija(id1); kirj1.vastaaHarari(id1); kirjahylly.lisaa(kirj1);
-            Kirjailija kirj2 = new Kirjailija(id1); kirj2.vastaaHarari(id1); kirjahylly.lisaa(kirj2);
-            Kirjailija kirj3 = new Kirjailija(id2); kirj3.vastaaHarari(id2); kirjahylly.lisaa(kirj3);
+            kirjahylly.lisaa(deus);
+            deus.lisaaKirjailija(id1);
             
             System.out.println(
                     "============= Kirjahylly testi =================");
@@ -273,6 +274,7 @@ public class Kirjahylly {
                 List<Kirjailija> loytyneet = kirjahylly.annaKirjailijat(kirja);
                 for (Kirjailija kirjailija : loytyneet)
                     kirjailija.tulosta(System.out);
+                i++;
             }
 
         } catch (SailoException ex) {

@@ -13,7 +13,7 @@ import java.util.*;
 
 /**
  * @author ville
- * @version 16.7.2020
+ * @version 24.7.2020
  *
  */
 public class Kirjailijat implements Iterable<Kirjailija> {
@@ -59,7 +59,7 @@ public class Kirjailijat implements Iterable<Kirjailija> {
 
 
     /**
-     * Lukee kirjat tiedostosta.
+     * Lukee kirjailijat tiedostosta.
      * @param tiedosto tiedoston nimen alku
      * @throws SailoException jos lukeminen epäonnistuu
      * @example
@@ -67,11 +67,11 @@ public class Kirjailijat implements Iterable<Kirjailija> {
      * #THROWS SailoException 
      * #import java.io.File;
      *  Kirjailijat kirjailijat = new Kirjailijat();
-     *  Kirjailija kirjailija21 = new Kirjailija(); kirjailija21.vastaaHarari(2);
-     *  Kirjailija kirjailija11 = new Kirjailija(); kirjailija11.vastaaHarari(1);
-     *  Kirjailija kirjailija22 = new Kirjailija(); kirjailija22.vastaaHarari(2); 
-     *  Kirjailija kirjailija12 = new Kirjailija(); kirjailija12.vastaaHarari(1); 
-     *  Kirjailija kirjailija23 = new Kirjailija(); kirjailija23.vastaaHarari(2); 
+     *  Kirjailija kirjailija21 = new Kirjailija(); kirjailija21.vastaaHarari();
+     *  Kirjailija kirjailija11 = new Kirjailija(); kirjailija11.vastaaHarari();
+     *  Kirjailija kirjailija22 = new Kirjailija(); kirjailija22.vastaaHarari(); 
+     *  Kirjailija kirjailija12 = new Kirjailija(); kirjailija12.vastaaHarari(); 
+     *  Kirjailija kirjailija23 = new Kirjailija(); kirjailija23.vastaaHarari(); 
      *  String tiedNimi = "testikirjailijat";
      *  File ftied = new File(tiedNimi+".dat");
      *  ftied.delete();
@@ -213,29 +213,16 @@ public class Kirjailijat implements Iterable<Kirjailija> {
      * #import java.util.*;
      * 
      *  Kirjailijat kirjailijat = new Kirjailijat();
-     *  Kirjailija kirj21 = new Kirjailija(2); kirjailijat.lisaa(kirj21);
-     *  Kirjailija kirj11 = new Kirjailija(1); kirjailijat.lisaa(kirj11);
-     *  Kirjailija kirj22 = new Kirjailija(2); kirjailijat.lisaa(kirj22);
-     *  Kirjailija kirj12 = new Kirjailija(1); kirjailijat.lisaa(kirj12);
-     *  Kirjailija kirj23 = new Kirjailija(2); kirjailijat.lisaa(kirj23);
+     *  Kirjailija kirj21 = new Kirjailija("Harari"); kirjailijat.lisaa(kirj21);
+     *  Kirjailija kirj11 = new Kirjailija("Austen"); kirjailijat.lisaa(kirj11);
+     *  Kirjailija kirj22 = new Kirjailija("Shelley"); kirjailijat.lisaa(kirj22);
      * 
      *  Iterator<Kirjailija> i2=kirjailijat.iterator();
      *  i2.next() === kirj21;
      *  i2.next() === kirj11;
      *  i2.next() === kirj22;
-     *  i2.next() === kirj12;
-     *  i2.next() === kirj23;
-     *  i2.next() === kirj12;  #THROWS NoSuchElementException  
-     *  
-     *  int n = 0;
-     *  int knrot[] = {2,1,2,1,2};
-     *  
-     *  for ( Kirjailija kirj:kirjailijat ) { 
-     *    kirj.getKirjaNro() === knrot[n]; n++;  
-     *  }
-     *  
-     *  n === 5;
-     *  
+     *  i2.next() === kirj11;  #THROWS NoSuchElementException  
+     *
      * </pre>
      */
     @Override
@@ -246,42 +233,58 @@ public class Kirjailijat implements Iterable<Kirjailija> {
 
     /**
      * Haetaan kirjan kirjailija 
-     * @param tunnusnro kirjan tunnusnumero jolle kirjailija haetaan
+     * @param kirjailijaId kirjailijan tunnusnumero
      * @return tietorakenne jossa viiteet löydettyyn kirjailijaan
      * @example
      * <pre name="test">
      * #import java.util.*;
      * 
      *  Kirjailijat kirjailijat = new Kirjailijat();                      
-     *  Kirjailija kirj21 = new Kirjailija(2); kirjailijat.lisaa(kirj21); 
-     *  Kirjailija kirj11 = new Kirjailija(1); kirjailijat.lisaa(kirj11); 
-     *  Kirjailija kirj22 = new Kirjailija(2); kirjailijat.lisaa(kirj22); 
-     *  Kirjailija kirj12 = new Kirjailija(1); kirjailijat.lisaa(kirj12); 
-     *  Kirjailija kirj23 = new Kirjailija(2); kirjailijat.lisaa(kirj23); 
+     *  Kirjailija kirj21 = new Kirjailija(); kirj21.vastaaHarari(); kirj21.rekisteroi(); kirjailijat.lisaa(kirj21); 
+     *  Kirjailija kirj11 = new Kirjailija(); kirj11.vastaaHarari(); kirj11.rekisteroi(); kirjailijat.lisaa(kirj11); 
+     *  Kirjailija kirj22 = new Kirjailija(); kirj22.vastaaHarari(); kirj22.rekisteroi(); kirjailijat.lisaa(kirj22); 
+     *  Kirjailija kirj12 = new Kirjailija(); kirj12.vastaaHarari(); kirj12.rekisteroi(); kirjailijat.lisaa(kirj12); 
+     *  Kirjailija kirj23 = new Kirjailija(); kirj23.vastaaHarari(); kirj23.rekisteroi(); kirjailijat.lisaa(kirj23); 
      *
      *  
      *  List<Kirjailija> loytyneet;
      *  loytyneet = kirjailijat.annaKirjailijat(3);
-     *  loytyneet.size() === 0; 
+     *  loytyneet.size() === 1; 
      *  loytyneet = kirjailijat.annaKirjailijat(1);
-     *  loytyneet.size() === 2; 
-     *  loytyneet.get(0) == kirj11 === true;
-     *  loytyneet.get(1) == kirj12 === true;
+     *  loytyneet.get(0) == kirj21 === true;
+     *  loytyneet.get(0) == kirj12 === false;
      *  loytyneet = kirjailijat.annaKirjailijat(2);
-     *  loytyneet.size() === 3; 
-     *  loytyneet.get(0) == kirj23 === false;
+     *  loytyneet.get(0) == kirj11 === true;
      * </pre> 
      */
-    public List<Kirjailija> annaKirjailijat(int tunnusnro) {
+    public List<Kirjailija> annaKirjailijat(int kirjailijaId) {
         List<Kirjailija> loydetyt = new ArrayList<Kirjailija>();
         for (Kirjailija kirj : alkiot)
-            if (kirj.getKirjaNro() == tunnusnro) loydetyt.add(kirj);
+            if (kirj.getTunnusNro() == kirjailijaId) loydetyt.add(kirj);
         return loydetyt;
     }
 
 
     /**
+     * haetaan kaikki kirjailijat
      * @return kaikki kirjailijat
+     * @example
+     * <pre name="test">
+     * #import java.util.*;
+     * 
+     *  Kirjailijat kirjailijat = new Kirjailijat();
+     *
+     *  Kirjailija kirj25 = new Kirjailija("Harari"); kirj25.rekisteroi(); kirjailijat.lisaa(kirj25); 
+     *  Kirjailija kirj17 = new Kirjailija("Austen"); kirj17.rekisteroi(); kirjailijat.lisaa(kirj17); 
+     *  Kirjailija kirj27 = new Kirjailija("Shelley"); kirj27.rekisteroi(); kirjailijat.lisaa(kirj27); 
+     *  
+     *  List<Kirjailija> loytyneet;
+     *  loytyneet = kirjailijat.annaKirjailijat();
+     *  loytyneet.size() === 3; 
+     *  loytyneet.get(0) == kirj25 === true;
+     *  loytyneet.get(2) == kirj27 === true;
+     *  loytyneet.get(0) == kirj17 === false;
+     * </pre> 
      */
     public List<Kirjailija> annaKirjailijat() {
         List<Kirjailija> loydetyt = new ArrayList<Kirjailija>();
@@ -298,28 +301,31 @@ public class Kirjailijat implements Iterable<Kirjailija> {
     public static void main(String[] args) {
         Kirjailijat kirjailijat = new Kirjailijat();
         Kirjailija kirj1 = new Kirjailija();
-        kirj1.vastaaHarari(2);
+        kirj1.vastaaHarari(); kirj1.rekisteroi();
         Kirjailija kirj2 = new Kirjailija();
-        kirj2.vastaaHarari(1);
+        kirj2.vastaaHarari(); kirj2.rekisteroi();
         Kirjailija kirj3 = new Kirjailija();
-        kirj3.vastaaHarari(2);
-        Kirjailija kirj4 = new Kirjailija("Austen", 1);
-        Kirjailija kirj5 = new Kirjailija("Shelley", 2);
+        kirj3.vastaaHarari(); kirj3.rekisteroi();
+        Kirjailija kirj4 = new Kirjailija("Austen"); kirj4.rekisteroi();
+        Kirjailija kirj5 = new Kirjailija("Shelley"); kirj5.rekisteroi();
  
         kirjailijat.lisaa(kirj1);
         kirjailijat.lisaa(kirj2);
         kirjailijat.lisaa(kirj3);
-        kirjailijat.lisaa(kirj2);
         kirjailijat.lisaa(kirj4);
         kirjailijat.lisaa(kirj5);
         
  
         System.out.println("============= Kirjailijat testi =================");
  
-        List<Kirjailija> kirjailijat2 = kirjailijat.annaKirjailijat(2);
+        List<Kirjailija> kirjailijat2 = kirjailijat.annaKirjailijat();
+        List<Kirjailija> kirjailijat3 = kirjailijat.annaKirjailijat(4);
  
         for (Kirjailija kirj : kirjailijat2) {
-            System.out.print(kirj.getKirjaNro() + " ");
+            kirj.tulosta(System.out);
+        }
+        
+        for (Kirjailija kirj : kirjailijat3) {
             kirj.tulosta(System.out);
         }
  
