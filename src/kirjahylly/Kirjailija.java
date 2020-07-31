@@ -203,6 +203,10 @@ public class Kirjailija implements Cloneable, Tietue {
     }
 
 
+    /**
+     * @param k minkä kentän kysymys halutaan
+     * @return valitun kentän kysymysteksti
+     */
     @Override
     public String getKysymys(int k) {
         switch (k) {
@@ -263,6 +267,9 @@ public class Kirjailija implements Cloneable, Tietue {
     }
 
 
+    /**
+     * Luodaan klooni kirjailijasta
+     */
     @Override
     public Kirjailija clone() throws CloneNotSupportedException {
         return(Kirjailija)super.clone();

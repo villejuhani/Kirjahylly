@@ -86,6 +86,26 @@ public class Kirjailijat implements Iterable<Kirjailija> {
      * @param i monennenko kirjailijan viite halutaan
      * @return viite kirjailijaan, jonka indeksi on i
      * @throws IndexOutOfBoundsException jos i ei ole sallitulla alueella  
+     * @example
+     * <pre name="test">
+     * #THROWS IndexOutOfBoundsException
+     *  Kirjailijat kirjailijat = new Kirjailijat();
+     *  Kirjailija kirjailija21 = new Kirjailija(); kirjailija21.vastaaHarari();
+     *  Kirjailija kirjailija11 = new Kirjailija(); kirjailija11.vastaaHarari();
+     *  Kirjailija kirjailija22 = new Kirjailija(); kirjailija22.vastaaHarari(); 
+     *  Kirjailija kirjailija12 = new Kirjailija(); kirjailija12.vastaaHarari(); 
+     *  Kirjailija kirjailija23 = new Kirjailija(); kirjailija23.vastaaHarari();
+     *  kirjailijat.lisaa(kirjailija21);
+     *  kirjailijat.lisaa(kirjailija11);
+     *  kirjailijat.lisaa(kirjailija22);
+     *  kirjailijat.lisaa(kirjailija12);
+     *  kirjailijat.lisaa(kirjailija23);
+     *  
+     *  kirjailijat.anna(1) == kirjailija11 === true;
+     *  kirjailijat.anna(2) == kirjailija23 === false;
+     *  kirjailijat.anna(-1); #THROWS IndexOutOfBoundsException
+     *  kirjailijat.anna(5); #THROWS IndexOutOfBoundsException
+     * </pre>
      */
     public Kirjailija anna(int i) throws IndexOutOfBoundsException {
         if (i < 0 || getLkm() <= i)

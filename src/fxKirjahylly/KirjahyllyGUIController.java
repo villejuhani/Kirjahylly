@@ -138,7 +138,9 @@ public class KirjahyllyGUIController {
         
     }
     
-    
+    /**
+     * avataan Tietojen Muokkaus -ikkuna, viedään kirjaKohdalla, tuodaan muutokset kirjaan
+     */
     private void muokkaaTietoja() {
         if ( kirjaKohdalla == null) return;
         alustaKirjailijatSB();
@@ -266,6 +268,9 @@ public class KirjahyllyGUIController {
     }
     
     
+    /**
+     * Alustaa kirjailijat ComboBoxille StringBuilderilla
+     */
     private void alustaKirjailijatSB() {
         if (kirjaKohdalla == null) return;
         sbKirjailijat = new StringBuilder();
@@ -318,6 +323,9 @@ public class KirjahyllyGUIController {
     }
     
     
+    /**
+     * Näytetään Tietoja -ikkuna tilastoineen
+     */
     private void naytaTilastot() {
         int luetut = 0;
         int sivut = 0;

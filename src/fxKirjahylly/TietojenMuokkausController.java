@@ -175,9 +175,9 @@ public class TietojenMuokkausController
     }
 
 
-    
-
-
+    /**
+     * Tallentaa tiedot kirjaan.
+     */
     private void tallenna() {
         if (kirjaKohdalla.getNimi().trim().equals("")) {
             naytaVirhe("Nimi ei saa olla tyhjä");
@@ -201,6 +201,10 @@ public class TietojenMuokkausController
     }
     
     
+    /**
+     * Näytetään virhe jos oikeellisuustarkistukset niin vaativat
+     * @param virhe teksti joka näytetään
+     */
     private void naytaVirhe(String virhe) {
         if ( virhe == null || virhe.isEmpty()) {
             labelVirhe.setText("");
@@ -227,6 +231,9 @@ public class TietojenMuokkausController
     }
 
 
+    /**
+     * Lisätään kirjailija
+     */
     private void lisaaKirjailija() {
         String uusiKirjailija = LisaaKirjailijaController.lisaaNimi(null, "");
         if (uusiKirjailija == null)
@@ -238,6 +245,10 @@ public class TietojenMuokkausController
     }
     
     
+    /**
+     * Alustaa editTilan ComboBoxin. Muokattavan kirjan tila attribuutti ensimmäiseksi.
+     * @return tila merkkijonona ComboBoxille sopivassa muodossa
+     */
     private String alustaTila() {
         StringBuilder sb = new StringBuilder(kirjaKohdalla.getTila());
         sb.append("\n");
@@ -246,6 +257,10 @@ public class TietojenMuokkausController
     }
     
     
+    /**
+     * Alustaa editArvion ComboBoxin. Muokattavan kirjan arvio attribuutti ensimmäiseksi.
+     * @return arvio merkkijonona ComboBoxille sopivassa muodossa
+     */
     private String alustaArvio() {
         StringBuilder sb = new StringBuilder("" + kirjaKohdalla.getArvio());
         sb.append("\n");
@@ -254,20 +269,27 @@ public class TietojenMuokkausController
     }
 
     
+    /**
+     * Alustaa editTilan ComboBoxin. Muokattavan kirjan tila attribuutti ensimmäiseksi.
+     */
     private void alustaComboBoxChooser() {
         String s = sbKirjailijat.toString();
         chooserKirjailijat.setRivit(s);
     }
     
 
+    /**
+     * Asettaa ComboBoxin riveiksi kirjailijoiden nimet
+     * @param kirjailijat kirjailijoiden nimet ComboBoxille sopivana merkkijonona
+     */
     private void asetaComboBoxChooser(String kirjailijat) {
         chooserKirjailijat.setRivit(kirjailijat);
     }
 
 
     /**
-     * @param kirjailija lisättävä kirjailija
-     * @return kaikki kirjailijat
+     * @param kirjailija lisättävän kirjailijan nimi
+     * @return kaikkien kirjailijoiden nimet merkkijonona
      */
     public String annaKirjailijat(String kirjailija) {
         sbKirjailijat.append(kirjailija);
@@ -291,6 +313,11 @@ public class TietojenMuokkausController
     }
 
 
+    /**
+     * Asettaa Kirjailija ComboBoxiin käytettävän StringBuilderin parametrina tuodusta StringBuilderista.
+     * @param sbKirjailijatGUI StringBuilder kirjailijoiden nimistä
+     * @return null
+     */
     private static ModalInitializeInterface<Kirja, ?> asetaKirjailijatSB(
             StringBuilder sbKirjailijatGUI) {
         sbKirjailijat = new StringBuilder();
@@ -300,7 +327,7 @@ public class TietojenMuokkausController
 
 
     /**
-     * @return kirjailija, null jos ei ole tehty uutta kirjailija Tietojen Muokkaus -ikkunassa.
+     * @return kirjailija, tai null jos ei ole tehty uutta kirjailijaa Tietojen Muokkaus -ikkunassa.
      */
     public static Kirjailija getApukirjailija() {
         return apukirjailija;
