@@ -1,19 +1,17 @@
-/**
- * 
- */
 package kirjahylly;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
 
 import fi.jyu.mit.ohj2.Mjonot;
+import kanta.Tietue;
 
 /**
- * @author ville
- * @version 24.7.2020
+ * @author Ville Hytönen ville.j.hytonen@student.jyu.fi
+ * @version 31.7.2020
  *
  */
-public class Kirjailija {
+public class Kirjailija implements Cloneable, Tietue {
     
     private int tunnusNro;
     private String nimi;
@@ -182,6 +180,92 @@ public class Kirjailija {
     kirj.tulosta(System.out);
     Kirjailija uusi = new Kirjailija("Shelley");
     uusi.tulosta(System.out);
+    }
+
+
+    /** 
+     * Palauttaa kirjan kenttien lukumäärän 
+     * @return kenttien lukumäärä 
+     */ 
+    @Override
+    public int getKenttia() {
+        return 2;
+    }
+
+    
+    /** 
+     * Eka kenttä joka on mielekäs kysyttäväksi 
+     * @return ekan kentän indeksi 
+     */ 
+    @Override
+    public int ekaKentta() {
+        return 1;
+    }
+
+
+    @Override
+    public String getKysymys(int k) {
+        switch (k) {
+            case 0:
+                return "id";
+            case 1:
+                return "nimi";
+        default:
+            return "defaultti";
+        }
+    }
+
+    
+    /** 
+     * Antaa k:n kentän sisällön merkkijonona 
+     * @param k monenenko kentän sisältö palautetaan 
+     * @return kentän sisältö merkkijonona 
+     */ 
+    @Override
+    public String anna(int k) {
+        switch ( k ) { 
+        case 0: return "" + tunnusNro; 
+        case 1: return "" + nimi;
+        default:
+            return "defaultti"; 
+        }
+    }
+
+
+    /** 
+     * Asettaa k:n kentän arvoksi parametrina tuodun merkkijonon arvon 
+     * @param k kuinka monennen kentän arvo asetetaan 
+     * @param s jono joka asetetaan kentän arvoksi 
+     * @return null jos asettaminen onnistuu, muuten vastaava virheilmoitus. 
+     * @example 
+     * <pre name="test"> 
+     *   Kirjailija kirjailija = new Kirjailija(); 
+     *   kirjailija.aseta(1,"Harari") === null; 
+     *   kirjailija.aseta(1,"24") === "Vain kirjaimia ja '-' nimeen";  
+     *   kirjailija.aseta(1,"Mörkö") === null;
+     * </pre> 
+     */ 
+    @Override
+    public String aseta(int k, String s) {
+        String tjono = s.trim(); 
+        StringBuffer sb = new StringBuffer(tjono); 
+        switch ( k ) { 
+        case 0: 
+            setTunnusNro(Mjonot.erota(sb, '§', getTunnusNro())); 
+            return null; 
+        case 1: 
+            if ( !tjono.toUpperCase().matches("[(A-Z)(ÖÄÅ)]*") ) return "Vain kirjaimia ja '-' nimeen";
+            nimi = tjono;
+            return null;
+        default:
+           return "defaultti"; 
+        }
+    }
+
+
+    @Override
+    public Kirjailija clone() throws CloneNotSupportedException {
+        return(Kirjailija)super.clone();
     }
 
 }

@@ -12,9 +12,10 @@ import java.io.PrintStream;
 import java.util.*;
 
 /**
- * @author ville
- * @version 24.7.2020
+ * @author Ville Hytönen ville.j.hytonen@student.jyu.fi
+ * @version 31.7.2020
  *
+ * 
  */
 public class Kirjailijat implements Iterable<Kirjailija> {
     
@@ -22,7 +23,7 @@ public class Kirjailijat implements Iterable<Kirjailija> {
     private String  tiedostonNimi = "";
 
     /** Taulukko kirjailijoista */
-    private Collection<Kirjailija> alkiot        = new ArrayList<Kirjailija>();
+    private List<Kirjailija> alkiot        = new ArrayList<Kirjailija>();
     
 
 
@@ -45,9 +46,45 @@ public class Kirjailijat implements Iterable<Kirjailija> {
     
     
     /**
-     * Palauttaa viitteen i:teen kirjaan.
-     * @param i monennenko kirjan viite halutaan
-     * @return viite kirjaan, jonka indeksi on i
+     * @param kirjailija lisättävä tai korvattava kirjailija
+     * <pre name="test">
+     * #THROWS SailoException,CloneNotSupportedException
+     * #PACKAGEIMPORT
+     * Kirjailijat kirjailijat = new Kirjailijat();
+     * Kirjailija kirjailija1 = new Kirjailija(), kirjailija2 = new Kirjailija();
+     * kirjailija1.rekisteroi(); kirjailija2.rekisteroi();
+     * kirjailijat.getLkm() === 0;
+     * kirjailijat.korvaaTaiLisaa(kirjailija1); kirjailijat.getLkm() === 1;
+     * kirjailijat.korvaaTaiLisaa(kirjailija2); kirjailijat.getLkm() === 2;
+     * Kirjailija kirjailija3 = kirjailija1.clone();
+     * kirjailija3.aseta(1, "test");
+     * Iterator<Kirjailija> it = kirjailijat.iterator();
+     * it.next() == kirjailija1 === true;
+     * kirjailijat.korvaaTaiLisaa(kirjailija3); kirjailijat.getLkm() === 2;
+     * it = kirjailijat.iterator();
+     * Kirjailija j0 = it.next();
+     * j0 === kirjailija3;
+     * j0 == kirjailija3 === true;
+     * j0 == kirjailija1 === false;
+     * </pre>
+     */
+    public void korvaaTaiLisaa(Kirjailija kirjailija) {
+        int id = kirjailija.getTunnusNro();
+        for (int i = 0; i < getLkm(); i++) {
+            if (alkiot.get(i).getTunnusNro() == id) {
+                alkiot.set(i, kirjailija);
+                muutettu = true;
+                return;
+            }
+        }
+        lisaa(kirjailija);
+    }
+    
+    
+    /**
+     * Palauttaa viitteen i:teen kirjailijaan.
+     * @param i monennenko kirjailijan viite halutaan
+     * @return viite kirjailijaan, jonka indeksi on i
      * @throws IndexOutOfBoundsException jos i ei ole sallitulla alueella  
      */
     public Kirjailija anna(int i) throws IndexOutOfBoundsException {
@@ -234,34 +271,30 @@ public class Kirjailijat implements Iterable<Kirjailija> {
     /**
      * Haetaan kirjan kirjailija 
      * @param kirjailijaId kirjailijan tunnusnumero
-     * @return tietorakenne jossa viiteet löydettyyn kirjailijaan
+     * @return kirjailija tai null jos ei löydy
      * @example
      * <pre name="test">
      * #import java.util.*;
      * 
-     *  Kirjailijat kirjailijat = new Kirjailijat();                      
-     *  Kirjailija kirj21 = new Kirjailija(); kirj21.vastaaHarari(); kirj21.rekisteroi(); kirjailijat.lisaa(kirj21); 
-     *  Kirjailija kirj11 = new Kirjailija(); kirj11.vastaaHarari(); kirj11.rekisteroi(); kirjailijat.lisaa(kirj11); 
-     *  Kirjailija kirj22 = new Kirjailija(); kirj22.vastaaHarari(); kirj22.rekisteroi(); kirjailijat.lisaa(kirj22); 
-     *  Kirjailija kirj12 = new Kirjailija(); kirj12.vastaaHarari(); kirj12.rekisteroi(); kirjailijat.lisaa(kirj12); 
-     *  Kirjailija kirj23 = new Kirjailija(); kirj23.vastaaHarari(); kirj23.rekisteroi(); kirjailijat.lisaa(kirj23); 
+     *  Kirjailijat kirjailijaat = new Kirjailijat();                      
+     *  Kirjailija kirj21 = new Kirjailija(); kirj21.vastaaHarari(); kirj21.rekisteroi(); kirjailijaat.lisaa(kirj21); 
+     *  Kirjailija kirj11 = new Kirjailija("Shelley"); kirj11.rekisteroi(); kirjailijaat.lisaa(kirj11); 
+     *  Kirjailija kirj22 = new Kirjailija("Austen"); kirj22.rekisteroi(); kirjailijaat.lisaa(kirj22); 
+     *  Kirjailija kirj12 = new Kirjailija("Testii"); kirj12.rekisteroi(); kirjailijaat.lisaa(kirj12); 
+     *  Kirjailija kirj23 = new Kirjailija("King"); kirj23.rekisteroi(); kirjailijaat.lisaa(kirj23); 
      *
-     *  
-     *  List<Kirjailija> loytyneet;
-     *  loytyneet = kirjailijat.annaKirjailijat(3);
-     *  loytyneet.size() === 1; 
-     *  loytyneet = kirjailijat.annaKirjailijat(1);
-     *  loytyneet.get(0) == kirj21 === true;
-     *  loytyneet.get(0) == kirj12 === false;
-     *  loytyneet = kirjailijat.annaKirjailijat(2);
-     *  loytyneet.get(0) == kirj11 === true;
+     *  Kirjailija kirj101 = kirjailijaat.annaKirjailijat(3);
+     *  Kirjailija kirj102 = kirjailijaat.annaKirjailijat(5);
+     *  kirj101 == kirj21 === true;
+     *  kirj102 == kirj12 === false;
+     *  Kirjailija kirj103 = kirjailijaat.annaKirjailijat(4);
+     *  kirj103 == kirj11 === true;
      * </pre> 
      */
-    public List<Kirjailija> annaKirjailijat(int kirjailijaId) {
-        List<Kirjailija> loydetyt = new ArrayList<Kirjailija>();
+    public Kirjailija annaKirjailijat(int kirjailijaId) {
         for (Kirjailija kirj : alkiot)
-            if (kirj.getTunnusNro() == kirjailijaId) loydetyt.add(kirj);
-        return loydetyt;
+            if (kirj.getTunnusNro() == kirjailijaId) return kirj;
+        return null;
     }
 
 
@@ -319,15 +352,14 @@ public class Kirjailijat implements Iterable<Kirjailija> {
         System.out.println("============= Kirjailijat testi =================");
  
         List<Kirjailija> kirjailijat2 = kirjailijat.annaKirjailijat();
-        List<Kirjailija> kirjailijat3 = kirjailijat.annaKirjailijat(4);
+        Kirjailija kirjailija3 = kirjailijat.annaKirjailijat(4);
  
         for (Kirjailija kirj : kirjailijat2) {
             kirj.tulosta(System.out);
         }
         
-        for (Kirjailija kirj : kirjailijat3) {
-            kirj.tulosta(System.out);
-        }
+            kirjailija3.tulosta(System.out);
+        
  
     }
 

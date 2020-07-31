@@ -7,9 +7,10 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
+
 /**
- * @author ville
- * @version 24.7.2020
+ * @author Ville Hytönen ville.j.hytonen@student.jyu.fi
+ * @version 31.7.2020
  *
  */
 public class Kirjahylly {
@@ -56,6 +57,30 @@ public class Kirjahylly {
     public void lisaa(Kirjailija kirj) {
         kirjailijat.lisaa(kirj);
     }
+
+    
+    /**
+     * Korvaa kirjan tietorakenteessa. Ottaa kirjan omistukseensa.
+     * Etsitään samlla tunnusnumerolla oleva kirja. JOs ei löydy, niin lisätään uutena 
+     * kirjana.
+     * @param kirja lisättävän kirjan viite
+     */
+    public void korvaaTaiLisaa(Kirja kirja) {
+        kirjat.korvaaTaiLisaa(kirja);
+        
+    }
+    
+    
+    /**
+     * Korvaa kirjan tietorakenteessa. Ottaa kirjan omistukseensa.
+     * Etsutöön samlla tunnusnumerolla oleva kirja. JOs ei löydy, niin lisätään uutena 
+     * kirjailijana.
+     * @param kirjailija lisättävän kirjailijan viite
+     */
+    public void korvaaTaiLisaa(Kirjailija kirjailija) {
+        kirjailijat.korvaaTaiLisaa(kirjailija);
+        
+    }
     
     
     /**
@@ -79,18 +104,15 @@ public class Kirjahylly {
      *  kirja1.rekisteroi(); kirja2.rekisteroi(); kirja3.rekisteroi();
      *  kirja3.lisaaKirjailija(id1);
      *  
-     *  List<Kirjailija> loytyneet;
-     *  loytyneet = kirjahylly.annaKirjailijat(kirja3);
-     *  loytyneet.size() === 1; 
-     *  loytyneet = kirjahylly.annaKirjailijat(kirja1);
-     *  loytyneet.size() === 1; 
-     *  loytyneet.get(0) == kirj21 === true;
-     *  loytyneet = kirjahylly.annaKirjailijat(kirja2);
-     *  loytyneet.size() === 1; 
-     *  loytyneet.get(0) == kirj22 === false;
+     *  Kirjailija kirj101 = kirjahylly.annaKirjailijat(kirja1);
+     *  Kirjailija kirj102 = kirjahylly.annaKirjailijat(kirja3);
+     *  kirj102 == kirj21 === true;
+     *  kirj101 == kirj22 === false;
+     *  Kirjailija kirj103 = kirjahylly.annaKirjailijat(kirja2);
+     *  kirj103 == kirj11 === true;
      * </pre> 
      */
-    public List<Kirjailija> annaKirjailijat(Kirja kirja) {
+    public Kirjailija annaKirjailijat(Kirja kirja) {
         return kirjailijat.annaKirjailijat(kirja.getKirjailijaId());
     }
     
@@ -126,9 +148,8 @@ public class Kirjahylly {
      * @param hakuehto hakuehto
      * @param k etsittävän kentän indeksi
      * @return tietorakenne löytyneistä kirjoista
-     * @throws SailoException jos menee pieleen
      */
-    public Collection<Kirja> etsi(String hakuehto, int k) throws SailoException{
+    public Collection<Kirja> etsi(String hakuehto, int k) {
         return kirjat.etsi(hakuehto, k);
     }
     
@@ -179,12 +200,14 @@ public class Kirjahylly {
     
     
     /**
-     * Poistaa kirjoista ja kirjailijoista ne joilla on nro. Kesken.
-     * @param nro viitenumero, jonka mukaan poistetaan
+     * Poistaa kirjan
+     * @param kirja joka poistetaan
      * @return montako kirjaa poistettiin
      */
-    public int poista(@SuppressWarnings("unused") int nro) {
-        return 0;
+    public int poista(Kirja kirja) {
+        if ( kirja == null ) return 0;
+        int ret = kirjat.poista(kirja.getTunnusNro());
+        return ret;
     }
 
 
@@ -221,9 +244,9 @@ public class Kirjahylly {
     
     
     /**
-     * palauttaa i:n kirjan
+     * palauttaa i:n kirjailijann
      * @param i monesko kirja palautetaan
-     * @return viite i:teen kirjaan
+     * @return viite i:teen kirjailijaan
      * @throws IndexOutOfBoundsException jos i väärin
      */
     public Kirjailija annaKirjailija(int i) throws IndexOutOfBoundsException {
@@ -271,8 +294,7 @@ public class Kirjahylly {
             for (Kirja kirja: kirjat) {
             System.out.println("Kirja paikassa: " + i);
                 kirja.tulosta(System.out);
-                List<Kirjailija> loytyneet = kirjahylly.annaKirjailijat(kirja);
-                for (Kirjailija kirjailija : loytyneet)
+                Kirjailija kirjailija = kirjahylly.annaKirjailijat(kirja);
                     kirjailija.tulosta(System.out);
                 i++;
             }

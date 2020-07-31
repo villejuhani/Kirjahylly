@@ -7,33 +7,43 @@ import java.util.List;
 import fi.jyu.mit.fxgui.ComboBoxChooser;
 import fi.jyu.mit.fxgui.Dialogs;
 import fi.jyu.mit.fxgui.ListChooser;
-import fi.jyu.mit.fxgui.ModalController;
 import fi.jyu.mit.fxgui.TextAreaOutputStream;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.text.Font;
+import javafx.scene.layout.GridPane;
 import kirjahylly.Kirja;
 import kirjahylly.Kirjahylly;
 import kirjahylly.Kirjailija;
 import kirjahylly.SailoException;
 
 /**
- * @author ville
- * @version 24.7.2020
+ * @author Ville Hytönen ville.j.hytonen@student.jyu.fi
+ * @version 31.7.2020
  *
+ * TODO: kirjailijan poistaminen. 
  */
 public class KirjahyllyGUIController {
     
     @FXML private TextField haku;
     @FXML private Label labelVirhe;
     @FXML private ScrollPane panelKirja;
+    @FXML private GridPane gridKirja; 
     @FXML private ListChooser<Kirja> chooserKirjat;
     @FXML private ComboBoxChooser<String> chooserJarjesta;
-    
+    @FXML private TextField editNimi;
+    @FXML private TextField editKirjailija;
+    @FXML private TextField editGenre;
+    @FXML private TextField editJulkaisuvuosi;
+    @FXML private TextField editSivumaara;
+    @FXML private ComboBoxChooser<String> editTila;
+    @FXML private ComboBoxChooser<Integer> editArvio;
+    @FXML private DatePicker editPvm;
+    @FXML private TextArea editKommentit;
     
 
     /**
@@ -44,9 +54,10 @@ public class KirjahyllyGUIController {
     }
     
     @FXML private void handleHaku () {
-        String ehto = haku.getText();
-        if (ehto.isEmpty()) naytaVirhe(null);
-        else naytaVirhe("Ei osata vielä hakea");
+        hae(0);
+        //String ehto = haku.getText();
+        //if (ehto.isEmpty()) naytaVirhe(null);
+        //else naytaVirhe("Ei osata vielä hakea");
     }
 
     
@@ -56,13 +67,15 @@ public class KirjahyllyGUIController {
     
     
     @FXML void handleMuokkaaTietoja() {
-        palautaTiedot();
+        //palautaTiedot();
+        muokkaaTietoja();
     }
     
     
+
     @FXML void handleTietoja() {
-        ModalController.showModal(KirjahyllyGUIController.class.getResource("Tietoja.fxml"),
-                "Tietoja", null, "");
+        naytaTilastot();
+        
     }
     
     
@@ -77,15 +90,21 @@ public class KirjahyllyGUIController {
 
     
     @FXML void handlePoistaKirja() {
-        Dialogs.showMessageDialog("Vielä ei osata poistaa kirjaa");
+        poistaKirja();
     }
+    
+    
+    @FXML void handleTilastot() {
+        naytaTilastot();
+    }
+
 
     
     @FXML void handlePoistaKirjailija() {
-        Dialogs.showMessageDialog("Vielä ei osata poistaa kirjailijaa");
+        Dialogs.showMessageDialog("Vielä ei osata poistaa");
     }
    
-    
+
     @FXML void handleJarjesta() {
         if (kirjaKohdalla == null)
             Dialogs.showMessageDialog("Vielä ei osata järjestää");
@@ -103,51 +122,60 @@ public class KirjahyllyGUIController {
     
     private Kirjahylly kirjahylly;
     private Kirja kirjaKohdalla;
-    private TextArea areaKirja = new TextArea();
     private String kirjahyllynnimi = "kirjalista";
+    private StringBuilder sbKirjailijat = new StringBuilder();
+    
     
     
     /**
-     * Tekee tarvittavat muut alustukset, vaihdetan GridPanen tilalle
-     * yksi iso tekstikenttä, johon voidaan tulostaa jäsenten tiedot.
-     * Alustetaan myös jasenlistan kuuntelija
+     * Tekee tarvittavat muut alustukset
      */
     protected void alusta() {
-        panelKirja.setContent(areaKirja);
-        areaKirja.setFont(new Font("Courier New", 12));
         panelKirja.setFitToHeight(true);
         
         chooserKirjat.clear();
         chooserKirjat.addSelectionListener(e -> naytaKirja());
+        
     }
-   
+    
+    
+    private void muokkaaTietoja() {
+        if ( kirjaKohdalla == null) return;
+        alustaKirjailijatSB();
+       try {
+            Kirja kirja = TietojenMuokkausController.kysyKirja(null, kirjaKohdalla.clone(), sbKirjailijat ); 
+            if (kirja == null) return;
+            kirjahylly.korvaaTaiLisaa(kirja);
+            
+            Kirjailija kirjailija = TietojenMuokkausController.getApukirjailija();
+            if (kirjailija != null) kirjahylly.korvaaTaiLisaa(kirjailija);
+            
+            hae(kirja.getTunnusNro());
+        } catch (CloneNotSupportedException e) {
+            //
+        } 
+        
+    }
+    
     
     /**
-     * Näyttää virheen jos haku epäonnistuu
-     */
-   private void naytaVirhe(String virhe) {
-       if ( virhe == null || virhe.isEmpty()) {
-           labelVirhe.setText("");
-           labelVirhe.getStyleClass().removeAll("virhe");
-           return;
-       }
-       labelVirhe.setText(virhe);
-       labelVirhe.getStyleClass().add("virhe");
-   }
-    
-    
-    /**
-     * Näyttää listalta valitun jäsenen tiedot
+     * Näyttää listalta valitun kirjan tiedot
      */
     protected void naytaKirja() {
         kirjaKohdalla = chooserKirjat.getSelectedObject();
         
         if (kirjaKohdalla == null) return;
         
-        areaKirja.setText("");
-        try (PrintStream os = TextAreaOutputStream.getTextPrintStream(areaKirja)){
-            tulosta(os, kirjaKohdalla);
-        }
+        editNimi.setText(kirjaKohdalla.getNimi());
+        Kirjailija kirjailija = kirjahylly.annaKirjailija(kirjaKohdalla.getKirjailijaId());
+        editKirjailija.setText(kirjailija.getNimi());
+        editGenre.setText(kirjaKohdalla.getGenre());
+        editJulkaisuvuosi.setText("" + kirjaKohdalla.getVuosi());
+        editSivumaara.setText("" + kirjaKohdalla.getSivut());
+        editTila.setRivit(kirjaKohdalla.getTila());
+        editPvm.setPromptText(kirjaKohdalla.getPvm());
+        editArvio.setRivit("" + kirjaKohdalla.getArvio());
+        editKommentit.setText(kirjaKohdalla.getKommentit());
     }
     
     
@@ -156,6 +184,7 @@ public class KirjahyllyGUIController {
      * @return null jos onnistuu, muuten virhe
      */
     protected String lueTiedosto() {
+        
         try {
             kirjahylly.lueTiedostosta(kirjahyllynnimi);
             hae(0);
@@ -166,37 +195,36 @@ public class KirjahyllyGUIController {
             if ( virhe != null) Dialogs.showMessageDialog(virhe);
             return virhe;
         }
+        
     }
     
     
     /**
      * Hakee kirjojen tiedot listaan
-     * @param knro kirjan numero, joka aktivoidaan haun jälkeen
+     * @param knr kirjan numero, joka aktivoidaan haun jälkeen
      */
-    protected void hae(int knro) {
+    protected void hae(final int knr) {
+        int knro = knr;
+        if ( knro <= 0) {
+            Kirja kohdalla = kirjaKohdalla;
+            if ( kohdalla != null ) knro = kohdalla.getTunnusNro();
+        }
+        
         int k = chooserJarjesta.getSelectionModel().getSelectedIndex();
         String ehto = haku.getText();
-        if (k > 0 || ehto.length() > 0)
-            naytaVirhe(String.format("Ei osata hakea", k, ehto));
-        else
-            naytaVirhe(null);
+        if (ehto.indexOf('*') < 0) ehto = "*" + ehto + "*";
         
         chooserKirjat.clear();
   
         int index = 0;
-        Collection<Kirja> kirjat;
-        try {
-            kirjat = kirjahylly.etsi(ehto, k);
+            var kirjat = kirjahylly.etsi(ehto, k);
             int i = 0;
             for (Kirja kirja: kirjat) {
                 if (kirja.getTunnusNro() == knro) index = i;
                 chooserKirjat.add(kirja.getNimi(), kirja);
                 i++;
             }
-        } catch (SailoException ex) {
-            Dialogs.showMessageDialog("Jäsenen hakemisessa ongelmia! " + ex.getMessage());
-        }
-        chooserKirjat.setSelectedIndex(index); // tästä tulee muutosviesti joka näyttää jäsenen
+        chooserKirjat.setSelectedIndex(index); // tästä tulee muutosviesti joka näyttää kirjan
     }
     
     
@@ -205,14 +233,18 @@ public class KirjahyllyGUIController {
      */
     protected void lisaaKirja(){
         Kirja uusi = new Kirja();
+        alustaKirjailijatSB();
+        uusi = TietojenMuokkausController.kysyKirja(null, uusi, sbKirjailijat);
+        if ( uusi == null ) return;
         uusi.rekisteroi();
-        uusi.taytaSapiensTiedoilla();
         try {
             kirjahylly.lisaa(uusi);
         } catch (SailoException e) {
             Dialogs.showMessageDialog("Ongelmia uuden luomisessa" + e.getMessage());
             return;
         }
+        Kirjailija kirjailija = TietojenMuokkausController.getApukirjailija();
+        if (kirjailija != null) kirjahylly.korvaaTaiLisaa(kirjailija);
         hae(uusi.getTunnusNro());
     }
     
@@ -227,33 +259,75 @@ public class KirjahyllyGUIController {
             return;
         Kirjailija kirjailija = new Kirjailija(uusiKirjailija);
         kirjailija.rekisteroi();
-        kirjahylly.lisaa(kirjailija);
+        kirjahylly.korvaaTaiLisaa(kirjailija);
+        kirjailijatLisaaSB(kirjailija.getNimi());
         kirjaKohdalla.lisaaKirjailija(kirjailija.getTunnusNro());
         hae(kirjaKohdalla.getTunnusNro());
     }
     
     
-    /**
-     * Avaa Tietojen muokkaus -ikkunan ja ottaa uudesta kirjailijasta kopin
-     */
-    private void palautaTiedot() {
+    private void alustaKirjailijatSB() {
         if (kirjaKohdalla == null) return;
-        String uusiKirjailija = TietojenMuokkausController.annaKirjailija(null, "");
-        if (uusiKirjailija == null) return;
-        Kirjailija kirjailija = new Kirjailija(uusiKirjailija);
-        kirjailija.rekisteroi();
-        kirjahylly.lisaa(kirjailija);
-        kirjaKohdalla.lisaaKirjailija(kirjailija.getTunnusNro());
-        hae(kirjaKohdalla.getTunnusNro());
+        sbKirjailijat = new StringBuilder();
+        Kirjailija eka = kirjahylly.annaKirjailija(kirjaKohdalla.getKirjailijaId());
+        StringBuilder sb = new StringBuilder(eka.getNimi());
+        
+        List<Kirjailija> kirjailijat = kirjahylly.annaKirjailijat();
+        for (Kirjailija kirjailija : kirjailijat) {
+            sbKirjailijat.append(kirjailija.getNimi());
+            sbKirjailijat.append("\n");
+        }
+        sb.append("\n");
+        sb.append(sbKirjailijat);
+        sbKirjailijat = new StringBuilder(sb);
+        
+        
     }
     
     
     /**
-     * @param kirjahylly jota käytetään tässä käyttöliittymässä
+     * @param kirjailija lisättävä kirjailija
+     */
+    public void kirjailijatLisaaSB(String kirjailija) {
+        sbKirjailijat.append(kirjailija);
+        sbKirjailijat.append("\n");
+    }
+    
+    
+    /**
+     * @param kirjahylly Kirjahylly jota käytetään tässä käyttöliittymässä
      */
     public void setKirjahylly(Kirjahylly kirjahylly) {
         this.kirjahylly = kirjahylly;
         naytaKirja();
+    }
+    
+    
+    /**
+     * Poistetaan listalta valittu kirja
+     */
+    private void poistaKirja() {
+        Kirja kirja = kirjaKohdalla;
+        if ( kirja == null ) return;
+        if ( !Dialogs.showQuestionDialog("Poisto", "Poistetaanko kirja: " + kirja.getNimi(), "Kyllä", "Ei") )
+            return;
+        kirjahylly.poista(kirja);
+        int index = chooserKirjat.getSelectedIndex();
+        hae(0);
+        chooserKirjat.setSelectedIndex(index);
+    }
+    
+    
+    private void naytaTilastot() {
+        int luetut = 0;
+        int sivut = 0;
+        for (int i = 0; i < kirjahylly.getKirjoja(); i++) {
+            if ( kirjahylly.annaKirja(i).getTila().equals("Luettu") ) luetut++;
+            sivut += kirjahylly.annaKirja(i).getSivut();
+        }
+        
+        String[] til = new String[] { "" + kirjahylly.getKirjoja(), "" + luetut, "" + sivut };
+        TietojaController.avaa(null, til);
     }
     
     
@@ -266,9 +340,8 @@ public class KirjahyllyGUIController {
         os.println("----------------------------------------------");
         kirja.tulosta(os);
         os.println("----------------------------------------------");
-        List<Kirjailija> kirjailijat = kirjahylly.annaKirjailijat(kirja);   
-        for (Kirjailija kirj:kirjailijat)
-            kirj.tulosta(os);  
+        Kirjailija kirjailija = kirjahylly.annaKirjailijat(kirja);  
+        kirjailija.tulosta(os);  
     }
     
     
@@ -278,15 +351,13 @@ public class KirjahyllyGUIController {
      */
     public void tulostaValitut(TextArea text) {
         try (PrintStream os = TextAreaOutputStream.getTextPrintStream(text)) {
-            os.println("Tulostetaan kaikki kirjat");
-            Collection<Kirja> kirjat = kirjahylly.etsi("", -1);
-            for (Kirja kirja: kirjat) {
-                tulosta(os, kirja);
-                os.println("\n\n");
-            }
-        } catch (SailoException ex) {
-            Dialogs.showMessageDialog("Kirjan hakemisessa ongelmia " + ex.getMessage());
-        }
+         os.println("Tulostetaan kaikki kirjat");
+         Collection<Kirja> kirjat = kirjahylly.etsi("", -1);
+         for (Kirja kirja: kirjat) {
+             tulosta(os, kirja);
+             os.println("\n\n");
+         }
+        } 
     }
 
 
@@ -313,5 +384,6 @@ public class KirjahyllyGUIController {
             return ex.getMessage();
         }
     }
+
   
 }

@@ -9,9 +9,10 @@ import javafx.fxml.FXMLLoader;
 
 
 /**
- * @author ville
- * @version 24.7.2020
+ * @author Ville Hytönen ville.j.hytonen@student.jyu.fi
+ * @version 31.7.2020
  *
+ * 
  */
 public class KirjahyllyMain extends Application {
 	@Override

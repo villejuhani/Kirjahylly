@@ -1,7 +1,7 @@
 package kirjahylly;
 
 /**
- * @author ville
+ * @author Ville Hytönen ville.j.hytonen@student.jyu.fi
  * @version 23.6.2020
  *
  */

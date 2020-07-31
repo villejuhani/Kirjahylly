@@ -8,7 +8,7 @@ import javafx.stage.Stage;
   
   /**
    * 
-   * @author ville
+   * @author Ville Hytönen ville.j.hytonen@student.jyu.fi
    * @version 9.7.2020
    */
   public class LisaaKirjailijaController implements ModalControllerInterface<String> {

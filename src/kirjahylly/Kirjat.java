@@ -12,13 +12,17 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import fi.jyu.mit.ohj2.WildChars;
+
 /**
- * @author ville
- * @version 24.7.2020
+ * @author Ville Hytönen ville.j.hytonen@student.jyu.fi
+ * @version 31.7.2020
  *
  */
 public class Kirjat implements Iterable<Kirja> {
@@ -69,6 +73,42 @@ public class Kirjat implements Iterable<Kirja> {
         lkm++;
         muutettu = true;
     }
+    
+    
+    /**
+     * @param kirja lisättävä tai korvattava kirja
+     * * <pre name="test">
+     * #THROWS SailoException,CloneNotSupportedException
+     * #PACKAGEIMPORT
+     * Kirjat kirjat = new Kirjat();
+     * Kirja kirja1 = new Kirja(), kirja2 = new Kirja();
+     * kirja1.rekisteroi(); kirja2.rekisteroi();
+     * kirjat.getLkm() === 0;
+     * kirjat.korvaaTaiLisaa(kirja1); kirjat.getLkm() === 1;
+     * kirjat.korvaaTaiLisaa(kirja2); kirjat.getLkm() === 2;
+     * Kirja kirja3 = kirja1.clone();
+     * kirja3.aseta(4,"2000");
+     * Iterator<Kirja> it = kirjat.iterator();
+     * it.next() == kirja1 === true;
+     * kirjat.korvaaTaiLisaa(kirja3); kirjat.getLkm() === 2;
+     * it = kirjat.iterator();
+     * Kirja j0 = it.next();
+     * j0 === kirja3;
+     * j0 == kirja3 === true;
+     * j0 == kirja1 === false;
+     * </pre>
+     */
+    public void korvaaTaiLisaa(Kirja kirja) {
+        int id = kirja.getTunnusNro();
+        for (int i = 0; i < lkm; i++) {
+            if (alkiot[i].getTunnusNro() == id) {
+                alkiot[i] = kirja;
+                muutettu = true;
+                return;
+            }
+        }
+        lisaa(kirja);
+    }
 
 
     /**
@@ -82,6 +122,81 @@ public class Kirjat implements Iterable<Kirja> {
             throw new IndexOutOfBoundsException("Laiton indeksi: " + i);
         return alkiot[i];
     }
+    
+    
+    /** 
+     * Poistaa kirjan jolla on valittu tunnusnumero  
+     * @param id poistettavan kirjan tunnusnumero 
+     * @return 1 jos poistettiin, 0 jos ei löydy 
+     * @example 
+     * <pre name="test"> 
+     * #THROWS SailoException  
+     * Kirjat kirjat = new Kirjat(); 
+     * Kirja kirja1 = new Kirja(), kirja2 = new Kirja(), kirja3 = new Kirja(); 
+     * kirja1.rekisteroi(); kirja2.rekisteroi(); kirja3.rekisteroi(); 
+     * int id1 = kirja1.getTunnusNro(); 
+     * kirjat.lisaa(kirja1); kirjat.lisaa(kirja2); kirjat.lisaa(kirja3); 
+     * kirjat.poista(id1+1) === 1; 
+     * kirjat.annaId(id1+1) === null; kirjat.getLkm() === 2; 
+     * kirjat.poista(id1) === 1; kirjat.getLkm() === 1; 
+     * kirjat.poista(id1+3) === 0; kirjat.getLkm() === 1; 
+     * </pre> 
+     *  
+     */ 
+    public int poista(int id) { 
+        int ind = etsiId(id); 
+        if (ind < 0) return 0; 
+        lkm--; 
+        for (int i = ind; i < lkm; i++) 
+            alkiot[i] = alkiot[i + 1]; 
+        alkiot[lkm] = null; 
+        muutettu = true; 
+        return 1; 
+    } 
+    
+    
+    /** 
+     * Etsii kirjan id:n perusteella 
+     * @param id tunnusnumero, jonka mukaan etsitään 
+     * @return kirja jolla etsitään indeksi tai null 
+     * <pre name="test"> 
+     * #THROWS SailoException  
+     * Kirjat kirjat = new Kirjat(); 
+     * Kirja kirja1 = new Kirja(); Kirja kirja2 = new Kirja(); Kirja kirja3 = new Kirja(); 
+     * kirja1.rekisteroi(); kirja2.rekisteroi(); kirja3.rekisteroi(); 
+     * int id1 = kirja1.getTunnusNro(); 
+     * kirjat.lisaa(kirja1); kirjat.lisaa(kirja2); kirjat.lisaa(kirja3); 
+     * kirjat.annaId(id1+1) == kirja2 === true; 
+     * kirjat.annaId(id1+2) == kirja3 === true; 
+     * </pre> 
+     */ 
+    public Kirja annaId(int id) { 
+        for (Kirja kirja : this) 
+            if (id == kirja.getTunnusNro()) return kirja; 
+        return null; 
+    } 
+    
+    
+    /** 
+     * Etsii kirjan id:n perusteella 
+     * @param id tunnusnumero, jonka mukaan etsitään 
+     * @return löytyneen kirjan indeksi tai -1 jos ei löydy 
+     * <pre name="test"> 
+     * #THROWS SailoException  
+     * Kirjat kirjat = new Kirjat(); 
+     * Kirja kirja1 = new Kirja(); Kirja kirja2 = new Kirja(); Kirja kirja3 = new Kirja(); 
+     * kirja1.rekisteroi(); kirja2.rekisteroi(); kirja3.rekisteroi(); 
+     * int id1 = kirja1.getTunnusNro(); 
+     * kirjat.lisaa(kirja1); kirjat.lisaa(kirja2); kirjat.lisaa(kirja3); 
+     * kirjat.etsiId(id1+1) === 1; 
+     * kirjat.etsiId(id1+2) === 2; 
+     * </pre> 
+     */ 
+    public int etsiId(int id) { 
+        for (int i = 0; i < lkm; i++) 
+            if (id == alkiot[i].getTunnusNro()) return i; 
+        return -1; 
+    } 
 
 
     /**
@@ -337,23 +452,74 @@ public class Kirjat implements Iterable<Kirja> {
      * @param hakuehto hakuehto 
      * @param k etsittävän kentän indeksi  
      * @return tietorakenteen löytyneistä kirjoista 
-     * @example 
-     * <pre name="test"> 
+     * @example
+     * <pre name="test">
      * #THROWS SailoException  
      *   Kirjat kirjat = new Kirjat(); 
-     *   Kirja kirja1 = new Kirja(); kirja1.parse("2|Sapiens|Tietokirjallisuus|2011|491|luettu|||3.2020|8|hauska"); 
-     *   Kirja kirja2 = new Kirja(); kirja2.parse("3|Frankenstein|Kauhu, romantiikka|1800|200|luettu|2017|||7|-");
-     *   kirjat.lisaa(kirja1); kirjat.lisaa(kirja2);
-     *   // TODO: toistaiseksi palauttaa kaikki kirjat 
+     *   Kirja kirja1 = new Kirja(); kirja1.parse("1|Sapiens|0|Tietokirjallisuus|"); 
+     *   Kirja kirja2 = new Kirja(); kirja2.parse("2|Frankenstein|2|Kauhu|"); 
+     *   Kirja kirja3 = new Kirja(); kirja3.parse("3|Ylpeys|1|Romantiikka"); 
+     *   kirjat.lisaa(kirja1); kirjat.lisaa(kirja2); kirjat.lisaa(kirja3);
+     *   List<Kirja> loytyneet;  
+     *   loytyneet = (List<Kirja>)kirjat.etsi("*a*",0);  
+     *   loytyneet.size() === 2;  
+     *   loytyneet.get(0) == kirja2 === true;  
+     *   loytyneet.get(1) == kirja1 === true; 
+     *     
+     *   loytyneet = (List<Kirja>)kirjat.etsi("*lp*",2);  
+     *   loytyneet.size() === 1;  
+     *   loytyneet.get(0) == kirja3 === true; 
+     *     
+     *   loytyneet = (List<Kirja>)kirjat.etsi(null,-1);  
+     *   loytyneet.size() === 3;  
      * </pre> 
      */ 
-    @SuppressWarnings("unused")
     public Collection<Kirja> etsi(String hakuehto, int k) { 
-        Collection<Kirja> loytyneet = new ArrayList<Kirja>(); 
+        String ehto = "*";
+        if ( hakuehto != null && hakuehto.length() > 0 ) ehto = hakuehto;
+        int hk = k;
+        if ( hk < 0 ) hk = 1;
+        List<Kirja> loytyneet = new ArrayList<Kirja>(); 
         for (Kirja kirja : this) { 
+            if (WildChars.onkoSamat(kirja.getNimi(), ehto))
             loytyneet.add(kirja);  
         } 
+        var vertailija = new Kirja.Vertailija(hk);
+        Collections.sort(loytyneet, vertailija);
+        if ( hk == 1 || hk == 2) loytyneet = kaanteinenJarj(loytyneet);
+            
         return loytyneet; 
+    }
+
+
+    /**
+     * Kääntää listan järjestyksen päinvastaiseksi
+     * @param loytyneet käännettävä lista
+     * @return käännetty lista
+     * @example
+     * <pre name="test">
+     * Kirjat kirjat = new Kirjat(); 
+     *   Kirja kirja1 = new Kirja(); kirja1.parse("1|Sapiens|0|Tietokirjallisuus|"); 
+     *   Kirja kirja2 = new Kirja(); kirja2.parse("2|Frankenstein|2|Kauhu|"); 
+     *   Kirja kirja3 = new Kirja(); kirja3.parse("3|Ylpeys|1|Romantiikka"); 
+     *   kirjat.lisaa(kirja1); kirjat.lisaa(kirja2); kirjat.lisaa(kirja3);
+     *   List<Kirja> loytyneet; 
+     *   loytyneet = (List<Kirja>)kirjat.etsi(null,0);  
+     *   loytyneet.size() === 3;
+     *   loytyneet.get(0) == kirja2 === true;  
+     *   loytyneet.get(1) == kirja1 === true; 
+     *   loytyneet = kirjat.kaanteinenJarj(loytyneet);  
+     *   loytyneet.get(0) == kirja3 === true;  
+     *   loytyneet.get(1) == kirja1 === true; 
+     * </pre>
+     */
+    public List<Kirja> kaanteinenJarj(List<Kirja> loytyneet) {
+        List<Kirja> kaanteinen = new ArrayList<Kirja>();
+        Object[] taulukko = loytyneet.toArray();
+        for (int i = loytyneet.size(); i > 0; i--) {
+            kaanteinen.add((Kirja)taulukko[i - 1]);
+        }
+        return kaanteinen;
     }
 
 
@@ -382,6 +548,7 @@ public class Kirjat implements Iterable<Kirja> {
             System.out.println("");
         }
     }
+
 
     
 }
